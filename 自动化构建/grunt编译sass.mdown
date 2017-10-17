@@ -1,0 +1,58 @@
+##需要的grunt插件
+grunt-contrib-watch
+grunt-contrib-sass
+
+##Gruntfile.js的配置
+
+```js
+module.exports = function (grunt) {
+    // Project configuration. 
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+        meta: {
+            basePath: '../',
+            srcPath: './scss/',
+            deployPath: './css/'
+        },
+        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %>\n' + '* Copyright (c) <%= grunt.template.today("yyyy") %> ',
+        sass: {
+            dist: {
+                files: {
+                    '<%= meta.deployPath %>style.css': '<%= meta.srcPath %>style.scss'
+                },
+                options: {
+                    style: 'compressed'
+                }
+            }
+        },
+        watch: {
+            scripts: {
+                files: ['<%= meta.srcPath %>/**/*.scss'],
+                tasks: ['sass']
+            }
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+
+    grunt.registerTask('default', ['sass']);
+};
+```
+
+
+
+
+
+  
+
+
+
+
+
+ 
+
+ 
+
+
+  

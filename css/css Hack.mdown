@@ -1,0 +1,56 @@
+##ie条件注释
+
+| 浏览器版本    | 语法                           |
+| -             |                                |
+| 所有ie        | <!--[if IE]><![endif]-->       |
+| ie6           | <!--[if IE 6]><![endif]-->     |
+| ie6以下版本   | <!--[if lt IE 6]><![endif]-->  |
+| ie6以上版本   | <!--[if gt IE 6]><![endif]-->  |
+| ie6及以下版本 | <!--[if lte IE 6]><![endif]--> |
+| ie6及以上版本 | <!--[if gte IE 6]><![endif]--> |
+|               |                                |
+
+##css选择器前缀
+
+| 浏览器版本   | 语法                                                                        |
+| -            |                                                                             |
+| ie6          | *html                                                                       |
+| ie7          | *+html                                                                      |
+| ie6,ie7      | @media screen\9{}                                                           |
+| ie8          | @media \0screen{}                                                           |
+| ie6,ie7,ie8  | @media \0screen\,screen\9{}                                                 |
+| ie8,ie9,ie10 | @media screen\0{}                                                           |
+| ie9,ie10     | @media screen and (min-width:0\0) {}                                        |
+| ie10         | @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {} |
+
+##css属性前后缀**
+
+| 浏览器版本           | 语法                                                                        |
+| -                    |                                                                             |
+| ie6                  | _                                                                           |
+| ie6                  | -                                                                           |
+| ie6,ie7              | +                                                                           |
+| ie6,ie7              | *                                                                           |
+| ie6,ie7              | #                                                                           |
+| ie8,ie9,ie10         | @media screen\0{}                                                           |
+| ie9,ie10             | @media screen and (min-width:0\0) {}                                        |
+| ie10                 | @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {} |
+| ie8,ie9,ie10,ie11    | \0                                                                          |
+| ie6,ie7,ie8,ie9,ie10 | \9                                                                          |
+| ie8,ie9,ie10         | \9\0                                                                        |
+
+
+
+ 
+
+
+
+
+
+  
+
+
+
+
+
+

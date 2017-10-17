@@ -1,0 +1,299 @@
+###H5 Canvas 时钟
+先贴上代码
+
+```html
+<canvas id="canvas" width="500" height="500"></canvas>
+```
+
+```javascript
+
+
+	var canvas = document.getElementById('canvas')
+	    var ctx = canvas.getContext('2d');
+	    var num = [6, 5, 4, 3, 2, 1, 12, 11, 10, 9, 8, 7];
+
+    function watch() {
+
+        //时分秒针时间设置
+        /*
+        * -90让指针的开始方向从竖直方向开始，即从12点开始
+        * new Data().getSeconds()/60*6，/60将秒转换成分，表盘一圈360度，每一分钟有6度，*6计算出秒针转动多少秒，分针对应需要转动多少度
+        * new Data().getMinutes()/60*30
+        * */
+        var indicator=new Date();
+        var ns=indicator.getSeconds()/60*360-90;
+        var nm=indicator.getMinutes()/60*360-90+(indicator.getSeconds()/60*6);
+        var nh=indicator.getHours()/12*360-90+(indicator.getMinutes()/60*30);
+
+        //表盘内方块区域时间设置
+        var date=new Date();
+        var Year=date.getFullYear();
+        var Month=date.getMonth()+1;
+        var DateTime=date.getDate();
+        var Day=date.getDay();
+        var Hours=date.getHours();
+        var Minutes=date.getMinutes();
+        var Seconds=date.getSeconds();
+        var weekDay,time;
+        switch (Day){
+            case 0:
+                weekDay='星期日';
+                break;
+            case 1:
+                weekDay='星期一';
+                break;
+            case 2:
+                weekDay='星期二';
+                break;
+            case 3:
+                weekDay='星期三';
+                break;
+            case 4:
+                weekDay='星期四';
+                break;
+            case 5:
+                weekDay='星期五';
+                break;
+            case 6:
+                weekDay='星期六';
+                break;
+        }
+        if (Hours > 0 && Hours <= 6) time = "凌晨";
+        if (Hours > 6 && Hours <= 9) time = "早上";
+        if (Hours > 9 && Hours <= 24) time = "上午";
+        if (Hours > 24 && Hours <= 14) time = "中午";
+        if (Hours > 14 && Hours <= 18) time = "下午";
+        if (Hours > 18 && Hours <= 24) time = "晚上";
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //外圆阴影
+        ctx.beginPath();
+        var shdow = ctx.createRadialGradient(250, 250, 96, 250, 250, 250);
+        shdow.addColorStop(0.1, 'rgba(74, 94, 157, 0.8)');
+        shdow.addColorStop(0.9, '#16171B');
+        ctx.fillStyle = shdow;
+        ctx.arc(250, 250, 250, 0, 2 * Math.PI, false);
+        ctx.fill();
+        ctx.closePath();
+
+        //蓝色边框
+        ctx.beginPath();
+        ctx.arc(250, 250, 200, 0, 2 * Math.PI);
+        ctx.fillStyle = '#09c';
+        ctx.fill();
+        ctx.closePath();
+
+        //仪表盘
+        ctx.beginPath();
+        var gradient = ctx.createRadialGradient(250, 250, 80, 250, 250, 250);
+        gradient.addColorStop(0, '#111');
+        gradient.addColorStop(1, '#222');
+        ctx.fillStyle = gradient;
+        ctx.arc(250, 250, 196, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.closePath();
+
+        //时间点
+        for (var i = 0; i < 12; i++) {
+            var lt = i * 30;
+            var x = Math.ceil(250 + 168 * Math.sin((Math.PI / 180) * lt));
+            var y = Math.ceil(250 + 168 * Math.cos((Math.PI / 180) * lt));
+            ctx.beginPath();
+            if (i == 3 || i == 6 || i == 9 || i == 12) {
+                ctx.font = 'italic 30px Arial';
+                ctx.fillStyle = "#FFF";
+            } else {
+                ctx.font = 'italic 22px Arial';
+                ctx.fillStyle = '#ddd';
+            }
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(num[i], x, y);
+            ctx.closePath();
+        }
+
+        //数字年月日
+        ctx.beginPath();
+        var linear = ctx.createLinearGradient(120, 235, 120, 265);
+        linear.addColorStop(0, '#fff');
+        linear.addColorStop(1, '#16171B');
+        ctx.fillStyle = linear;
+        ctx.fillRect(120, 235, 100, 30);
+        ctx.closePath();
+       //填充年月日
+        ctx.beginPath();
+        ctx.font='normal 18px Arial';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillStyle = '#000';
+        ctx.fillText(Year+'-'+Month+'-'+DateTime,canvas.width/2-(50+30),canvas.height/2);
+        ctx.closePath();
+
+        //汉字日期
+        ctx.beginPath();
+        var linear2 = ctx.createLinearGradient(280, 235, 280, 265);
+        linear2.addColorStop(0, '#fff');
+        linear2.addColorStop(1, '#16171B');
+        ctx.fillStyle = linear2;
+        ctx.fillRect(280, 236, 100, 30);
+        ctx.closePath();
+        //填充日期
+        //alert(Day);
+        ctx.beginPath();
+        ctx.font='normal 14px Microsoft YaHei';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillStyle = '#000';
+        ctx.fillText(weekDay+'~'+time,canvas.width/2+(50+30),canvas.height/2);
+        ctx.closePath();
+
+        //数字时分秒
+        ctx.beginPath();
+        var linear3 = ctx.createLinearGradient(200, 320, 200, 350);
+        linear3.addColorStop(0, '#fff');
+        linear3.addColorStop(1, '#16171B');
+        ctx.fillStyle = linear3;
+        ctx.fillRect(200, 320, 100, 30);
+        ctx.closePath();
+        //填充时分秒
+        ctx.beginPath();
+        ctx.font='normal 18px Microsoft YaHei';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillStyle='#000'
+        ctx.fillText(Hours+':'+Minutes+':'+Seconds,200+50,320+15);
+        ctx.closePath();
+
+        //人物标识
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle='#fff';
+        ctx.font='italic 24px Microsoft YaHe'
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText('TianTian',250,160);
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.translate(canvas.width / 2, canvas.height / 2); //旋转是以canvas的起点开始旋转的，所以需要改变旋转中心的坐标，使其在在圆的中间
+
+        //刻度
+        /*
+        * 刻度和指针应该放在一块绘制，这里涉及到一个技巧性问题，绘制刻度的时候旋转是以canvas的起点开始旋转的，所以需要改变旋转中心的坐标，使其在在圆的中间，每次循环绘制完一个刻度时需要还原中心坐标点，使其在绘制下一个刻度点的时候中心仍然在圆中间，在绘制指针的时候也需要还原
+        * */
+        for (var s = 0; s < 60; s++) {
+            ctx.save();
+            ctx.fillStyle = "#ccc";
+            ctx.rotate(((Math.PI * 2) / 60) * s);
+            ctx.fillRect(188, -1, 6, 2);
+            ctx.restore();
+        }
+
+
+
+        //指针
+        //时针
+        ctx.save();
+        ctx.rotate(nh*Math.PI/180);
+        ctx.fillStyle='#969';
+        ctx.fillRect(0,-2,100 ,4);
+        ctx.restore();
+        //分针
+        ctx.save();
+        ctx.rotate(nm*Math.PI/180);
+        ctx.fillStyle='rgba(74, 94, 157, 0.8)';
+        ctx.fillRect(0,-1.5,120 ,3);
+        ctx.restore();
+        //秒针
+        ctx.save();
+        ctx.rotate(ns*Math.PI/180);
+        ctx.fillStyle='#fff';
+        ctx.fillRect(0,0,140 ,1);
+        ctx.restore();
+        ctx.closePath();
+        //中心点
+
+        ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        var centerLinear=ctx.createLinearGradient(250,242,250,258);
+        centerLinear.addColorStop(0.1,'rgba(200,200,200,1)');
+        centerLinear.addColorStop(1,'rgba(80,80,80,1)');
+        ctx.fillStyle=centerLinear;
+        ctx.arc(250,250,8,0,2*Math.PI,false);
+        ctx.fill();
+        ctx.restore();
+        ctx.closePath();
+    }
+    watch()
+	setInterval(function () {
+	    watch();
+	},1000);
+```
+###在用canvas绘制这个时钟的时候有几个重难点和技巧性的地方下面来依次剖析
+####一、绘制时间点
+时间点就是小时数由1-12组成，圆的一周有360度，故每两个时间点之间的夹角为30(360/12)度。手表是基于500*500的方形画布上绘制，要正确安放时间点就要知道每个时间点X，Y坐标。
+这里用到三角函数数学知识Math.sin(弧度),Math.cos(弧度)。圆的一周是2π个弧度，360°，故 `1°=2π/360°`，因为是求时间点在整个方形画布上的坐标，所以应加上250。
+![这里写图片描述](http://img.blog.csdn.net/20161007233939769)
+`var x = Math.ceil(250 + 168 * Math.sin((Math.PI / 180) * lt))`,`var y = Math.ceil(250 + 168 * Math.cos((Math.PI / 180) * lt))`
+```js
+
+	//var num = [6, 5, 4, 3, 2, 1, 12, 11, 10, 9, 8, 7];
+	for (var i = 0; i < 12; i++) {
+	    var lt = i * 30;
+	    var x = Math.ceil(250 + 168 * Math.sin((Math.PI / 180) * lt));
+	    var y = Math.ceil(250 + 168 * Math.cos((Math.PI / 180) * lt));
+	    ctx.beginPath();
+	    if (i == 3 || i == 6 || i == 9 || i == 12) {
+	        ctx.font = 'italic 30px Arial';
+	        ctx.fillStyle = "#FFF";
+	    } else {
+	        ctx.font = 'italic 22px Arial';
+	        ctx.fillStyle = '#ddd';
+	    }
+	    ctx.textAlign = 'center';
+	    ctx.textBaseline = 'middle';
+	    ctx.fillText(num[i], x, y);
+	    ctx.closePath();
+	}
+```
+####二、绘制刻度点
+仪表盘一圈应有60个刻度，应采用循环旋转绘制刻度的方法，500*500的方形画布的原点在左上角，需要将原点至于圆形的中心点才能循环旋转绘制一个完整的刻度
+`ctx.translate(canvas.width / 2, canvas.height / 2)`
+2π个弧度平均分成60份，每一份的弧度就是`(Math.PI * 2) / 60`
+```js
+
+	ctx.translate(canvas.width / 2, canvas.height / 2); //旋转是以canvas的起点开始旋转的，所以需要改变旋转中心的坐标，使其在在圆的中间
+	for (var s = 0; s < 60; s++) {
+	    ctx.save();
+	    ctx.fillStyle = "#ccc";
+	    ctx.rotate(((Math.PI * 2) / 60) * s);
+	    ctx.fillRect(188, -1, 6, 2);
+	    ctx.restore();
+	}
+```
+####三、绘制三个指针(时针、分针、秒针)和时钟中心点
+刻度和指针应该放在一块绘制，且仪表中心圆点要在最后绘制，这样才能盖住三个指针的交叉点。这里涉及到一个技巧性问题，绘制刻度的时候旋转是以canvas的起点开始旋转的，所以需要改变旋转中心的坐标，使其在在圆的中间，每次循环绘制完一个刻度时需要还原中心坐标点，使其在绘制下一个刻度点的时候中心仍然在圆中间，在绘制指针的时候也需要还原。这里用到了canvas的`save()`方法和`restore()`方法
+####四、如何让时针、分针、秒针在正确的时间点在正确的位置
+让三个指针在正确的位置这里是最关键的一点也是比较难以理解的一点。首先指针的转动需要用到canvas的`rotate(弧度)`方法，我们只需要知道对应的弧度即可。在绘制时间点的时候已知`1°=2π/360`，那么现在我们只需要知道每个指针需要转动的角度即可。
+`indicator.getSeconds()/60*360-90`1分有60秒，60秒刚好一周360°。-90让指针的开始位置在竖直方向12点刻度的位置
+`indicator.getMinutes()/60*360-90`1小时有60分，60分刚好一周360°。-90让指针的开始位置在竖直方向12点刻度的位置
+`ndicator.getHours()/12*360-90`仪表盘一周有12个小时，12小时刚好一周360°。-90让指针的开始位置在竖直方向12点刻度的位置
+```js
+
+	var ns=indicator.getSeconds()/60*360-90;
+	var nm=indicator.getMinutes()/60*360-90;
+	var nh=indicator.getHours()/12*360-90;
+```
+这里还存在一个问题：当时间为4:30:50(4点30分50秒)，此时时针不应该正对着4这个刻度，而应该在4-5正中间，分针也不应该正对着6这个刻度，而应该在6-7之间靠近6。所以在这种情况下，分针转动的角度应该加上秒针转动的角度，时针转动的角度应该加上分针转动的角度
+
+```js
+
+	var indicator=new Date();
+	var ns=indicator.getSeconds()/60*360-90;
+	var nm=indicator.getMinutes()/60*360-90+(indicator.getSeconds()/60*6);
+	var nh=indicator.getHours()/12*360-90+(indicator.getMinutes()/60*30);
+```
+`indicator.getSeconds()/60*6`1分有60秒，1秒的角度是6°(360°/60)
+`indicator.getMinutes()/60*30`1小时有60分，1小时的角度是30°(360°/12)

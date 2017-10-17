@@ -1,0 +1,274 @@
+###继承
+###原型链继承
+```js
+function Box(){//被继承的函数叫做超类型(父类，基类)
+	this.name='lee';
+}
+function Desk(){//集成的函数叫做子类型(子类，派生类)
+	this.age=100
+}
+//通过原型链集成，超类型实例化后的对象实例，赋值给子类的原型属性
+//new Box()会将Box构造里的信息和原型里的信息都交给Desk
+Desk.prototype=new Box();//Desk继承Box，通过原型形成链条
+var desk=new Desk();
+alert(desk.name);//得到被继承的函数打印出lee
+```
+原型链继承流程图
+![原型链继承流程图](http://img.blog.csdn.net/20161101211459313)
+
+```js
+var box=new Box();
+var desk=new Desk();
+alert(desk instanceof Object);//true
+alert(desk instanceof Desk);//true
+alert(desk instanceof Box);//true
+alert(box instanceof Desk);//false 很明显父类型不从属于子类型，所以返回false
+//得出结论：子类型从属于自己或者其他的超类型
+```
+继承也有之前问题，比如字面量重写原型会中断关系，使用引用类型的原型，并且子类型还无法给超类型传递参数
+**原型继承缺点：**①无法传参②如果有共用的方法没办法共享
+为了解决引用共享和超类型无法传参的问题，我们采用一种叫借用构造函数的技术，或者成为对象冒充(伪造对象、经典继承)的技术来解决这两种问题。
+
+
+###对象冒充继承(伪造对象继承)
+**对象冒充继承优点：**解决了传参为题和共享问题
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+}
+function Desk(){
+	Box.call(this,name,age);//对象冒充
+}
+var desk=new Desk('lee',100);
+alert(desk.name);//lee
+```
+给`Box`方法添加一个原型属性
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+}
+Box.prototype.family=['哥哥']
+function Desk(){
+	Box.call(this,name,age);//对象冒充只能继承构造函数里的信息
+}
+var desk=new Desk('lee',100);
+alert(desk.family);//undefined
+```
+给`Box`方法添加一个属性
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family=['哥哥']；
+}
+
+function Desk(){
+	Box.call(this,name,age);//引用类型放在构造函数里就不会被共享
+}
+var desk=new Desk('lee',100);
+alert(desk.family);//['哥哥']
+desk.family.push('弟弟');
+alert(desk.family);//['哥哥','弟弟']
+
+var desk2=new Desk('lee',100);
+alert(desk.family);//['哥哥']
+
+```
+
+**注意：**对象冒充只能继承构造函数里的信息
+**注意：**引用类型放在构造函数里就不会被共享
+
+在`Box`中添加一个`run`方法
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family=['哥哥'];
+	this.run=function(){//每一次实例化都会为这个方法开辟一个空间，但是这个方法是一个公用的方法不需要每次都实例化，所以可以单独放到原型里面去
+		return this.name+this.age;
+	}
+}
+
+function Desk(){
+	Box.call(this,name,age);
+}
+```
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family=['哥哥'];
+	this.run=function(){//每一次实例化都会为这个方法开辟一个空间，但是这个方法是一个公用的方法不需要每次都实例化，所以可以单独放到原型里面去
+		return this.name+this.age;
+	}
+}
+```
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family=['哥哥'];
+}
+Box.prototype.run=function(){
+		return this.name+this.age;
+}
+function Desk(){
+	Box.call(this,name,age);
+}
+var desk=new Desk('lee' ,100);
+alert(desk.run());//无法访问到run这个方法。
+```
+**对象冒充继承缺点：**对象冒充继承无法继承原型里面的属性和方法，只能继承构造函数中的属性和方法
+
+借用构造函数虽然解决了刚才两种问题，但是没有原型复用无从谈起。需要用原型链+借用构造函数的模式这种模式称为组合继承
+
+###组合继承(原型链+对象冒充继承)**该继承方法用的比较广泛**
+**缺点：**超类型会被调用两次，要解决这个问题需要用到寄生组合继承
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family=['哥哥'];
+}
+Box.prototype.run=function(){
+		return this.name+this.age;
+}
+function Desk(){
+	Box.call(this,name,age);//对象冒充 第一次调用
+}
+Desk.prototype=new Box();//原型链继承 第二次调用
+var desk=new Desk('lee' ,100);
+alert(desk.run());//lee100
+```
+
+###原型式继承
+这种模式其实就是原型链继承，只不过换了一种写法
+**优点：**这种继承借助原型并基于已有的对象创建新对象，同时还不必因此创建自定义类型。
+**缺点：**还是会有引用类型会被共享的问题
+
+```js
+function obj(o) {//传递一个字面量函数
+	function F() {}//创建一个构造函数
+	F.prototype = o;//把字面量函数赋值给构造函数的原型
+	return new F();//最终返回出实例化的构造函数
+}
+
+var box = {//字面量对象
+	name : 'Lee',
+	arr : ['哥哥','妹妹','姐姐']
+};
+
+//下面来测试引用类型是否会被共享
+var box1 = obj(box);//传递
+alert(box1.name);
+box1.name = 'Jack';
+alert(box1.name);
+
+alert(box1.arr);
+box1.arr.push('父母');
+alert(box1.arr);
+
+var box2 = obj(box);//传递
+alert(box2.name);
+alert(box2.arr);//引用类型共享了
+```
+
+```js
+function obj(o) {
+	function F() {}
+	F.prototype = o;
+	return new F();
+}
+//相当于原型链继承
+function F(){}
+F.prototype=new Object();
+```
+
+###寄生式继承(原型式+工厂模式)
+```js
+//临时中转函数
+function obj(o) {
+	function F() {}
+	F.prototype = o;
+	return new F();
+}
+//寄生函数
+function create(o){
+	var f=obj(o);
+	return f;
+}
+var box={
+	name:'lee',
+	age:100,
+	family:['哥哥','姐姐','妹妹']
+}
+var box1=create(box);
+alert(box1.name)//lee
+```
+在`create`方法中增加一个run方法
+
+```js
+//临时中转函数
+function obj(o) {
+	function F() {}
+	F.prototype = o;
+	return new F();
+}
+//寄生函数
+function create(o){
+	var f=obj(o);
+	f.run=function(){
+		return this.name;
+	}
+	return f;
+}
+var box={
+	name:'lee',
+	age:100,
+	family:['哥哥','姐姐','妹妹']
+}
+var box1=create(box);
+alert(box1.run())//lee
+```
+
+###寄生组合继承
+```js
+//临时中转函数
+function obj(o) {
+	function F() {}
+	F.prototype = o;
+	return new F();
+}
+//寄生函数
+function create(box,desk){
+	var f=obj(box.prototype);
+	f.constructor=desk;
+	desk.prototype=f;
+}
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+}
+Box.prototype.run=function(){
+	return this.name+this.age;
+}
+function Desk(name,age){
+	Box.call(this,name,age);
+}
+//通过寄生组合继承来实现继承
+create(Box,Desk);
+var box={
+	name:'lee',
+	age:100,
+	family:['哥哥','姐姐','妹妹']
+}
+
+```

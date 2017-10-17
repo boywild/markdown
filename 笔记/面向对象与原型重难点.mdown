@@ -1,0 +1,441 @@
+##一、创建对象
+1. 普通模式
+优点：
+缺点：每次实例化产生大量重复的代码
+
+2. 工厂模式
+优点：集中实例化解决普通模式实例化产生大量重复代码的问题
+缺点：无法区分谁到底是哪个对象的实例
+
+3. 构造函数
+优点：既解决普通模式重复实例化的问题也解决工厂模式对象识别问题
+缺点：两个实例化后的属性或方法不相等
+
+##二、5种函数模式
+1. 原型模式
+优点：解决构造函数两个实例化后的属性或方法不相等的问题
+缺点：无法传参，引用类型共享
+
+2. 原型模式+构造函数
+优点：这种模式很好的解决了传参和引用共享的大难题。是创建对象比较好的方法
+缺点：不论是否调用了原型中的共享属性或方法，它都会初始化原型中的方法，并且在申明一个对象时，构造函数+原型的模式会让人感觉很怪异
+
+3. 动态原型模式(原型模式+构造函数的封装升级版)
+优点：暂无
+缺点：暂无
+
+4. 寄生构造函数
+优点：
+缺点：
+
+5. 稳妥构造函数
+寄生构造函数和稳妥构造函数的函数结构一样，只是稳妥构造函数不使用this，实例化是不使用new
+优点：
+缺点：
+
+##三、6种继承模式
+1. 原型链继承
+优点：
+缺点：字面量重写原型会中断关系，使用引用类型的原型，子类型无法给超类型（父类型）传参
+
+2. 借用构造函数继承(对象冒充继承)
+优点：解决了原型链继承传参为题和共享问题
+缺点：对象冒充只能继承构造函数里的信息，无法继承原型里的信息
+
+3. 组合继承(原型链集成+对象冒充继承)
+优点：解决借用构造函数继承无法继承原型里信息的问题
+缺点：超类型会被调用两次
+
+4. 原型式继承(原型链继承的升级版，加了一个中转函数)
+优点：解决组合继承超类型被调用两次的问题。这种继承借助原型并基于已有的对象创建新对象，同时还不必因此创建自定义类型。
+缺点：还是会有引用类型会被共享的问题
+
+5. 寄生式继承(原型式继承的升级版，在原型是继承的基础上又加了一个中转函数)
+优点：
+缺点：
+
+6. 寄生组合式继承(组合继承的升级版，把其中原型继承的部分更换为寄生式继承)
+优点：
+缺点：
+
+
+##四、其它
+1. Object.definePorperty()①数据属性②访问器属性
+2. Object.getOwnPropertyPescriptor() 取得给定属性
+3. Object.defineProperties()为对象定义多个属性
+4. Object.isPrototypeOf()来判断一个对象是否指向了该构造函数的原型对象
+5. Object.getPrototypeOf()取得原型中的属性值
+6. Object.hasOwnProPerty()检测一个属性存在于实例中还是存在原型中
+
+##一、创建对象
+###①普通模式
+**缺点：**①无法传参②多次实例化会产生大量的重复代码
+
+```js
+var obj=new Object();
+obj.name='chen';
+obj.age=24;
+obj.run=function(){
+	return this.name+this.age+'运行中...';
+}
+return obj;
+
+```
+###②工厂模式
+**优点：**①解决**普通模式**无法传参问题②解决**普通模式**多次实例化会产生大量重复代码的问题
+**缺点：**无法确定当前实例化对象到底是哪个函数对象的实例
+
+```js
+function model(){
+	var obj=new Object();
+	obj.name='chen';
+	obj.age=24;
+	obj.run=function(){
+		return this.name+this.age+'运行中...';
+	}
+	return obj;
+}
+function model2(){
+	var obj=new Object();
+	obj.name='chen';
+	obj.age=24;
+	obj.run=function(){
+		return this.name+this.age+'运行中...';
+	}
+	return obj;
+}
+var box1=model();
+var box2=model2();
+alert(box1 instanceof model);//false
+alert(box1 instanceof Object);//true
+alert(box1 instanceof model2);//false
+alert(box1 instanceof Object);//true
+```
+###③构造函数
+**优点：**解决**工厂模式**无法确定当前实例化对象到底是哪个函数对象的实例问题
+**缺点：**每次实例化对象的函数方法地址不一样(对于这个例子是指run()方法的地址不一样)
+
+```js
+function construct(name,age){
+	this.name=name;
+	this.age=age;
+	this.run=function(){
+		return this.name+this.age+'运行中';
+	}
+}
+
+var box1=new construct('chen',24);
+var box2=new construct('chen',24);
+alert(box1.name==box2.name)//true
+alert(box1.age==box2.age)//true
+alert(box1.run()==box2.run())//true
+alert(box1.run==box2.run)//false
+```
+可以把构造函数里的方法(或函数)用 new Function()方法来代替
+
+```js
+function construct(name,age){
+	this.name=name;
+	this.age=age;
+	this.run=link;
+}
+function link(){
+	return this.name+this.age+'运行中';
+}
+```
+我们可以通过构造函数外面绑定同一个函数的方法来保证引用地址的一致性，但这种做法没什么必要，只是加深学习了解
+
+```js
+function construct1(name,age){
+	this.name=name;
+	this.age=age;
+	this.run=new Function("return this.name+this.age+'运行中'");
+}
+```
+
+##二、5种函数模式
+###①原型模式
+**优点：**解决**构造函数**①实例化方法地址不一样的问题②原型里的属性和方法可以共享
+**缺点：**①无法传参，导致每次实例化结果都是一样②对于包含引用类型的值来说，原型的共享会存在问题
+
+```js
+function proto(){}
+proto.prototype.name='chen';
+proto.prototype.age=24;
+proto.prototype.run = function() {
+	return this.name+this.age+'运行中';
+};
+var box1=new proto();
+//假设为box1实例重写name属性
+box1.name='jack';//这里的重写并不会影响到原型中的name属性，
+alert(box1.name);//这里会按照就近原则来打印 jack
+var box2=new proto();
+alert(box1.run==box2.run);//true
+```
+对上述函数封装优化
+
+```js
+function proto(){}
+proto.prototype={
+	name:'chen',
+	age:24,
+	run:function(){
+		return this.name+this.age+'运行中..';
+	}
+}
+var box1=new proto();
+alert(box1.constructor);//Object
+//这里box1.constructor应该是指向proto()这个函数而不是Object
+```
+**解释：**面量方式为什么`constructor`会指向`Object`？因为`Box.prototype={}`;这种写法其实就是创建了一个新对象。而每创建一个函数，就会同时创建它`prototype`，这个对象也会自动获取`constructor`属性。 所以， 新对象的`constructor`重写了`Box`原来的`constructor`， 因此会指向新对象，那个新对象没有指定构造函数，那么就默认为`Object`。
+解决办法就是强制把`constructor`属性设为`proto`
+
+```js
+function proto(){}
+proto.prototype={
+	constructor:proto,
+	name:'chen',
+	age:24,
+	run:function(){
+		return this.name+this.age+'运行中..';
+	}
+}
+var box1=new proto();
+alert(box1.constructor);//proto
+```
+
+###②原型模式+构造函数
+**优点：**①解决**原型模式**无法传参的问题②解决**原型模式**引用类型实例化共享的问题(需要共享的放在原型中，不需要共享的放在构造函数中)
+**缺点：**①如果实例化多次原型中的方法会执行多次
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+}
+Box.prototype={
+	constructor:Box,
+	run:function(){
+		return this.name+this.age+'运行中...';
+	}
+	
+}
+```
+对Box进行三次实例化，然后分三次打印run方法，可以发现实例化多少次，run方法就会执行多少次。这样的执行方式对我们来说没有必须要，对性能也会有影响
+
+```js
+function Box(name,age){
+    this.name=name;
+    this.age=age;
+}
+Box.prototype={
+    constructor:Box,
+    run:function(){
+        alert('我在执行');
+        return this.name+this.age+'运行中...';
+    }
+    
+}
+var box1=new Box('chen',24);
+var box2=new Box('tian',12);
+var box3=new Box('meimei',23);
+alert(box1.run());
+alert(box2.run());
+alert(box3.run());
+```
+
+###③动态原型模式(该模式就是原型模式+构造函数的封装优化后的一种模式)
+**优点：**①解决**原型模式+构造函数**run方法多次执行的问题
+
+```js
+function Box(name,age){
+    this.name=name;
+    this.age=age;
+    if(typeof this.run !='function'){
+    	Box.prototype.run = function() {
+    		return this.name + this.age + '运行中...'
+    	};
+    }
+}
+```
+
+###④寄生构造函数(工厂模式+构造函数)
+
+```js
+function Box(name,age){
+	var obj=new Object();
+	obj.name=name;
+	obj.age=age;
+	obj.run=function(){
+		return this.name+this.age+'运行中...';
+	}
+	return obj;
+}
+```
+###⑤稳妥构造函数
+稳妥构造函数其实就是**寄生构造函数**，与**寄生构造函数**不同的是，在函数体内不用**this**，在实例化的时候不用**new**
+
+```js
+function Box(name,age){
+	var obj=new Object();
+	obj.name=name;
+	obj.age=age;
+	obj.run=function(){
+		return name+age+'运行中...';
+	}
+	return obj;
+}
+var box1=Box('chen',24);
+```
+##三、6种继承模式
+###①原型链继承
+**缺点：**①不能像超类型传参②包含引用类型的原型属性会被所有实例共享
+
+```js
+function Box(){
+	this.name='chen';
+}
+function Desk(){
+	this.age=24;
+}
+function Table(){
+	this.level = 'AAAAA';
+}
+
+Desk.prototype=new Box();
+Table.prototype=new Desk();
+var box=new Box();
+alert(box.constructor);//指向Box
+
+var desk=new Desk();
+alert(desk.constructor);//指向Box
+alert(desk.name);//chen
+alert(desk.age);//24
+
+var table=new Table();
+alert(table.constructor);//指向Box
+alert(table.name);//chen
+alert(table.age);//24
+alert(table.level);//AAAAA
+
+//子类型从属于自己或者他的超类型
+alert(desk instanceof Desk);
+alert(desk instanceof Box);
+alert(box instanceof Desk);
+```
+被继承的函数叫做超类型(父类，基类),继承的函数叫做子类型(子类，派生类)
+
+###②借用构造函数继承(也叫对象冒充继承)
+**优点：**①解决**原型链继承**无法传参的问题②解决**原型链继承**引用类型实例化共享的问题
+**缺点：**原型中的属性和方法不会被共享
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family = ['哥哥','姐姐','妹妹'];
+}
+Box.prototype.run=function(){
+	return this.name+this.age+'运行中...';
+}
+function Desk(name,age){
+	Box.call(this,name,age);
+}
+
+//下列代码可证明引用类型，放在构造里就不会被共享 
+var desk = new Desk('Lee', 100);
+alert(desk.family);
+desk.family.push('弟弟');
+alert(desk.family);
+
+var desk2 = new Desk('Lee', 100);
+alert(desk2.family);
+
+alert(desk2.run());//对象冒充,对象冒充只能继承构造里的信息,原型里的方法和属性不能继承
+
+```
+
+###③组合继承(原型链继承+借用构造函数继承)
+**这种方法使用的次数比较多**
+**缺点：**超类型在使用的过程中会被调用2次
+
+```js
+function Box(name,age){
+	this.name=name;
+	this.age=age;
+	this.family = ['哥哥','姐姐','妹妹'];
+}
+Box.prototype.run=function(){
+	return this.name+this.age+'运行中...';
+}
+function Desk(name,age){
+	Box.call(this,name,age);//用call来继承Box构造函数中的属性
+}
+Desk.prototype=new Box();//用Desk的原型来继承Box函数中的原型方法
+
+```
+`Box.call(this,name,age)`这里是第一次调用
+`new Box()`这里是第二次调用
+
+###④原型式继承(本质就是原型链继承，只是中间多了一个中转函数)
+**优点：**这种继承借助原型并基于已有的对象创建新对象，同时还不必因此创建自定义类型
+
+```js
+function obj(o){
+	function F(){}
+	F.prototype=o;//这里相当于F.prototype=new Object()也就是组合继承中的Desk.prototype=new Box()
+	return new F;
+}
+var box = {
+	name : 'Lee',
+	arr : ['哥哥','妹妹','姐姐']
+};
+
+//box1就等于new F()
+var box1 = obj(box);
+
+alert(box1.family);
+box1.family.push('弟弟');
+alert(box1.family);
+
+var box2 = obj(box);
+alert(box2.family);//引用类型的属性共享了
+```
+
+###⑤寄生式继承(原型式继承+工厂模式)在组合继承的模式上又增加一层中转函数
+**缺点：**
+1. 和原型式继承一样会有引用类型共享的问题
+2. 使用寄生式继承来为对象添加函数会由于不能做到函数复用而降低效率这一点与构造函数类似
+
+
+```js
+function obj(o){
+	function F(){}
+	F.prototype=o;
+	return new F;
+}
+function creat(o){
+	var f=obj(o);
+	f.run=function(){
+		return this.name+this.age+'运行中';
+	}
+	return f;
+}
+```
+
+###⑥寄生组合式继承
+
+```js
+function obj(o){
+	function F(){}
+	F.prototype=o;
+	return new F;
+}
+function creat(box,desk){
+	var f=obj(box.prototype);
+	f.run=function(){
+		return this.name+this.age;
+	}
+	desk.prototype=f;
+}
+```

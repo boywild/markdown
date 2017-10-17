@@ -1,0 +1,558 @@
+##一、webpack基本介绍
+* **1-1**webpack基本介绍
+webpack的概念和作用
+模块打包器
+代码分割 
+代码文件打包
+loader加载
+commonjs规范
+模块热更新
+适用于大型项目
+
+* **1-2**webpack安装和命令
+安装
+`npm install webpack --save-dev`
+
+例子：
+新建`hello.js`执行命令 `webpack hello.js hello.bundle.js` ，会生成`hello.bundle.js`文件，观察文件中的内容，可以看到`webpack`在文件中生成了许多其他代码
+
+新建`world.js`并在`hello.js`文件中`require('./world.js')`，再执行命令`webpack hello.js hello.bundle.js`，观察`hello.bundle.js`文件中的内容
+
+新建`style.css`,在样式表中随便新建几行样式`html,body{background: #f00;}`，在`hello.js`文件中`require('style-loader!css-loader!./style.css')`，执行命令`webpack hello.js hello.bundle.js`(**注意：**用`webpack`加载`css`需要用到`css-loader`，行内样式需要用到`style-loader`。安装`loader npm install css-loader style-loader --save-dev)`
+`css-loader`用来将`style.css`打包到`hello.bundle.js`文件中，使`webpack`能处理.css文件，如果将`css-loader`处理后的文件，引入到页面中后(在这个例子中引入页面的是`hello.bundle.js`)，`style-loader`则会将`style.css`中的样式以`<style></style>`的形式插入到`head`中
+
+如果在页面中没有加载这两个`loader`也可以在命令行中直接加载`loader` `webpack hello.js hello.bundle.js --module-bind 'css=style-loader!css-loader'`
+
+输入`webpack`可以查看`webpack`中有哪些配置项
+`webpack hello.js hello.bundle.js --watch` 用来监听文件，如果文件有变化则自动编译打包
+`webpack hello.js hello.bundle.js --progress` 用来查看打包的进度
+`webpack hello.js hello.bundle.js --display-module` 用来查看打包的模块
+`webpack hello.js hello.bundle.js --display-reson` 用来查看打包的原因
+
+
+##二、webpack基本配置
+* **2-1**建立项目的webpack配置
+
+例子：
+在webpack-demo目录下新建以下文件
+
+	webpack-demo
+	-dist
+	--js
+	-src
+	--script
+	--style
+	-index.html
+	-package.json
+	-webpack.config.js
+
+webpack.config.js
+
+```js
+module.exports = {
+    entry: './src/script/main.js',//入口文件
+    output: {
+        path: './dist/js',//输出路径
+        filename: 'bundle.js'//输出文件名
+    }
+}
+```
+运行 webpack 会在dist下的js目录下生成bundle.js
+
+可在pack.json的script字段中添加配置webpack
+
+	"scripts": {
+		"webpack":"webpack --config webpack.config.js --progress --display-modules --colors --display-reasons"
+	},
+
+
+* **2-2**`webpack`配置的`entry`和`output`
+`entry`是入口文件
+**①**`entry`可以是一个数组
+
+	entry:['a.js','main.js']
+
+**②**`entry`可以是一个对象用于多入口的情况下
+
+	entry:{
+		page1:'./page1'
+		page2:['entry1.js','entry2.js']
+	}
+在`entry`是多入口的情况下，output也应该是多个输出 `filename`有三个可选参数 `[name]`、`[hash]`、`[chunkhash]`
+
+    output: {
+        path: _dirname+'/built',//输出路径
+        filename: '[name].js'//输出文件名
+    }
+
+注意，在不同的版本下可能会报路径不是绝对路径的错误，解决办法为
+
+```js
+var path = require('path');
+module.exports = {
+    entry: [url('src/script/main.js'), url('src/script/a.js')],
+    output: {
+        path: url('./dist/js/'),
+        filename: 'bundle.js'
+    }
+}
+function url(url) {
+    return path.resolve(__dirname, url)
+}
+```
+
+##三、生成项目中的html文件
+* **3-1**自动化生成项目中的html文件(上)
+
+安装
+html-webpack-plugin(这里有个坑就是，如果在全局安装webpack，在运行npm run webpack之前需要运行 npm link webpack)
+自动生成html的意义在于，html中引用的js文件好多都是webpack打包之后生成的，生成的文件名和目录都有可能改变，这个时候不能手动来修改每一个变动的路径，太耗时，这个时候就要通过html-webpack-plugins这个插件来自动在html中生成对js的引用
+
+在webpack.config.js中加入plugins配置项
+
+```js
+var htmlWebpackPlugin = require('html-webpack-plugin');
+module.exports = {
+    entry: {
+        main: './src/script/main.js',
+        a: './src/script/a.js'
+    },
+    output: {
+        path: './dist',
+        filename: 'js/[name]-[hash].js'
+    },
+    plugins: [
+        new htmlWebpackPlugin({
+            template:'index.html',
+            inject:'head'
+        })
+    ]
+}
+```
+在htmlWebpackPlugin插件中配置项template用来定义引用的模板文件,inject用来指定脚本在dom文档中的插入位置
+
+* **3-2**自动化生成项目中的html文件(中)
+
+template应用场景
+在参数中传参，在模板中引用
+
+```js
+plugins: [
+    new htmlWebpackPlugin({
+        template:'index.html',
+        inject:'head',
+        title:'webpack is good'
+    })
+]
+```
+在html的title中，以如下的方式引用
+
+```html
+<title><%= htmlWebpackPlugin.options.plugins.title %></title>
+```
+<%= htmlWebpackPlugin.options.title %>这种方式的引用在模板中的任何一个位置都可以，例如
+
+```js
+plugins: [
+    new htmlWebpackPlugin({
+        template:'index.html',
+        inject:'head',
+        title:'webpack is good'
+        date:new Date()
+    })
+]
+```
+
+```html
+<body>
+	<%= htmlWebpackPlugin.options.date %>
+</body>
+```
+这样在编译后的`index.html`文件中会包含日期信息`Tue Apr 04 2017 23:25:58 GMT+0800 (中国标准时间)`
+
+在html文件中body标签中，输入如下代码，运行 npm run webpack
+
+```js
+    <% for(var key in htmlWebpackPlugin){ %>
+    <%= key %>
+    <% } %>
+```
+生成的文件中会有`files` `options`，这两个值说明在`htmlWebpackPlugin`插件中存在这两个对象
+
+继续遍历`htmlWebpackPlugin.files` `htmlWebpackPlugin.options`这两个对象
+
+```js
+    <% for(var key in htmlWebpackPlugin.files){ %>
+    <%= key %>:<%= JSON.stringify(htmlWebpackPlugin.files[key])%>
+    <% } %>
+    <% for(var key in htmlWebpackPlugin.options){ %>
+    <%= key %>:<%= JSON.stringify(htmlWebpackPlugin.options[key])%>
+    <% } %>
+```
+得到
+
+```js
+	//files
+    publicPath:""
+    chunks:{"main":{"size":27,"entry":"js/main-c6074c5f07c44041cf45.js","hash":"ddd0a31267a8793ca2d8","css":[]},"a":{"size":14,"entry":"js/a-c6074c5f07c44041cf45.js","hash":"ef609b383ce569e49d38","css":[]}}
+    js:["js/main-c6074c5f07c44041cf45.js","js/a-c6074c5f07c44041cf45.js"]
+    css:[]
+    manifest:
+  	//options
+    template:"F:\\localhost\\wamp\\www\\webpack-demo\\node_modules\\._html-webpack-plugin@2.28.0@html-webpack-plugin\\lib\\loader.js!F:\\localhost\\wamp\\www\\webpack-demo\\index.html"
+    filename:"index.html"    
+    hash:false   
+    inject:"head"    
+    compile:true    
+    favicon:false    
+    minify:false    
+    cache:true   
+    showErrors:true   
+    chunks:"all"   
+    excludeChunks:[]   
+    title:"webpack is good"  
+    xhtml:false
+    date:"2017-04-04T15:45:55.712Z"
+```
+
+```js
+//压缩
+minify:{
+	removeComments:true,//删除注释
+	collapseWhitespace:true//删除空格
+}
+```
+可以用`<%= %>`这种灵活的方式实现更多的个性化定制
+
+* **3-3**自动化生成项目中的html文件(下)
+
+多文件形式
+
+```js
+var htmlWebpackPlugin = require('html-webpack-plugin');
+module.exports = {
+    entry: {
+        main: './src/script/main.js',
+        a: './src/script/a.js',
+        b: './src/script/b.js',
+        c: './src/script/c.js'
+    },
+    output: {
+        path: './dist',
+        filename: 'js/[name]-[hash].js'
+    },
+    plugins: [
+        new htmlWebpackPlugin({
+            filename:'main.html',
+            template: 'index.html',
+            title: 'webpack is main',
+            date: new Date()
+        }),
+        new htmlWebpackPlugin({
+            filename:'a.html',
+            template: 'index.html',
+            title: 'webpack is a',
+            date: new Date()
+        }),
+        new htmlWebpackPlugin({
+            filename:'b.html',
+            template: 'index.html',
+            title: 'webpack is b',
+            date: new Date()
+        }),
+        new htmlWebpackPlugin({
+            filename:'c.html',
+            template: 'index.html',
+            title: 'webpack is c',
+            date: new Date()
+        })
+    ]
+}
+```
+chunks用来指定匹配的生成文件中应该生成数组中的文件(excludeChunks和chunks相反)
+
+```js
+var htmlWebpackPlugin = require('html-webpack-plugin');
+module.exports = {
+    entry: {
+        main: './src/script/main.js',
+        a: './src/script/a.js',
+        b: './src/script/b.js',
+        c: './src/script/c.js'
+    },
+    output: {
+        path: './dist',
+        filename: 'js/[name]-[hash].js'
+    },
+    plugins: [
+        new htmlWebpackPlugin({
+            filename:'main.html',
+            template: 'index.html',
+            title: 'webpack is main',
+            date: new Date(),
+            chunks:['a','b','c']
+        }),
+        new htmlWebpackPlugin({
+            filename:'a.html',
+            template: 'index.html',
+            title: 'webpack is a',
+            date: new Date(),
+            chunks:['b','c']
+        }),
+        new htmlWebpackPlugin({
+            filename:'b.html',
+            template: 'index.html',
+            title: 'webpack is b',
+            date: new Date(),
+            chunks:['a','c']
+        }),
+        new htmlWebpackPlugin({
+            filename:'c.html',
+            template: 'index.html',
+            title: 'webpack is c',
+            date: new Date(),
+            chunks:['a','b']
+        })
+    ]
+}
+```
+main.html中会生成 a.js b.js c.js
+a.html中会生成b.js c.js
+b.html中会生成a.js c.js
+c.html中会生成a.js b.js
+
+**将生成的脚本变成内联脚本**
+
+```js
+compilation.assets[htmlWebpackPlugin.files.chunks.main.entry].source()
+```
+如果在申明publicPath的情况下代码应该是这样
+
+```js
+compilation.assets[htmlWebpackPlugin.files.chunks.main.entry.substr(htmlWebpackPlugin.files.publicPath.length)].source()
+```
+htmlWebpackPlugin.files.publicPath.length 得到publicPath的长度例如 https://www.baidu.com
+htmlWebpackPlugin.files.chunks.main.entry.substr()得到文件真实路径
+最后用compilation.assets[].source()得到内容
+在main.js已经以内联的方式插入到文档，那么多后续的出来main.js则不需要任何操作，可以在index.html里面写入这样的模板语法，来判断是否是main.js以外的文件，如果不是则插入
+
+
+
+
+##四、处理项目中的资源文件
+* **4-1**什么是loader以及loader的特性
+
+
+* **4-2**使用babel-loader转换ES6代码
+
+```html
+webpack-demo
+-dist
+-node_modules
+-src
+--components
+---layer
+----layer.html
+----layer.js
+----layer.css
+--app.js
+-index.html
+-package.json
+-webpack.config.js
+```
+
+```js
+module:{
+    loaders:[
+        {
+            test:'/\.js$/',
+            loader:'babel',
+            exclude:'./node_modules/',//提高打包速度
+            include:'./src/',//提高打包速度
+            query:{
+                presets:['latest']
+            }
+        }
+    ]
+}
+```
+
+query用来指定额外的参数。presets:['latest']用来指定babel将要处理js的版本，版本可能有如下几种或者更多中情况ES2015 ES2016 ES2017，latest指定最近的三个版本
+presets:['latest']也可以放在package.json文件中
+```js
+"babel":{
+    "presets":["latest"]
+}
+```
+
+或者放在.babelrc中
+```js
+{
+    presets:["latest"]
+}
+```
+
+path.resolve(__dirname+'')，用来将相对路径改为绝对路径
+
+cnpm install --save-dev babel-preset-latest
+cnpm install --save-dev babel
+
+注意：在webpack2.0中 有些不一样
+npm install --save-dev babel-loader babel-core babel-preset-env
+
+```js
+module: {
+    rules: [
+        {
+            test:  /\.js$/,
+            loader: 'babel-loader',
+            exclude:  path.resolve(__dirname + 'node_modules'),
+            include: path.resolve(__dirname + 'src'),
+            query: {
+                presets: ['env']
+            }
+        }
+    ]
+}
+```
+**注意：**加入include配置项会导致babel不处理es6语法，原因暂不明
+
+* **4-3**处理项目中的css
+
+postcss-loader
+autoprefixer
+autoprefixer是postcss-loader的一个子集
+
+```js
+module: {
+    rules: [{
+            test: /\.js$/,
+            loader: 'babel-loader',
+            exclude: path.resolve(__dirname + 'node_modules'),
+            query: {
+                presets: ['env']
+            }
+        },
+        {
+            test: /\.css$/,
+            use: [
+                'style-loader',
+                'css-loader?importLoaders=1',
+                {
+                    loader: 'postcss-loader',
+                    options: {
+                        plugins: function() {
+                            return [
+                                require('autoprefixer')
+                            ];
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
+ loader的执行顺序从右向左
+?importLoaders=1!是css-loader这个loader后面的参数，意思是在postcss-loader后制定一个处理import样式的命令
+
+
+
+
+* **4-4**使用less和sass
+sass-loader less-loader
+
+* **4-5**处理模板文件
+html-loader
+
+* **4-6**处理图片及其他文件
+file-loader url-loader
+
+
+```js
+var htmlWebpackPlugin = require('html-webpack-plugin');
+
+var path = require('path');
+module.exports = {
+    entry: {
+        "main": __dirname + '/src/script/main.js',
+        "a": __dirname + '/src/script/a.js',
+        "b": __dirname + '/src/script/b.js',
+        "c": __dirname + '/src/script/c.js',
+    },
+    output: {
+        filename: 'js/[name]-[hash].js',
+        path: __dirname + '/dist',
+    },
+    module: {
+        rules: [{
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: path.resolve(__dirname + 'node_modules'),
+                query: {
+                    presets: ['env']
+                }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader:'css-loader',
+                        options:{
+                           importLoaders:1
+                         }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: function() {
+                                return [
+                                    require('autoprefixer')
+                                ];
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    plugins: [
+        new htmlWebpackPlugin({
+            filename: 'main.html',
+            template: 'index.html',
+            inject: false,
+            title: 'webpack is main.html',
+            date: new Date(),
+            excludeChunks: ['a', 'b']
+        }),
+        new htmlWebpackPlugin({
+            filename: 'a.html',
+            template: 'index.html',
+            inject: false,
+            title: 'webpack is a.html',
+            date: new Date(),
+            excludeChunks: ['b', 'c']
+        }),
+        new htmlWebpackPlugin({
+            filename: 'b.html',
+            template: 'index.html',
+            inject: false,
+            title: 'webpack is b.html',
+            date: new Date(),
+            excludeChunks: ['a', 'c']
+        }),
+        new htmlWebpackPlugin({
+            filename: 'c.html',
+            template: 'index.html',
+            inject: false,
+            title: 'webpack is c.html',
+            date: new Date(),
+            excludeChunks: ['a', 'b']
+        })
+    ]
+}
+
+```
+
+

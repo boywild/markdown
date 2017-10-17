@@ -1,0 +1,92 @@
+#JS操作iframe里的dom
+##一、父级窗口操作iframe里的dom
+JS操作iframe里的dom可是使用contentWindow属性，contentWindow属性是指指定的frame或者iframe所在的window对象，在IE中iframe或者frame的contentWindow属性可以省略，但在Firefox中如果要对iframe对象进行编辑则，必须指定contentWindow属性，**contentWindow属性支持所有主流浏览器**。
+
+相关的还有一个contentDocument属性，这个属性是指指定的frame或者iframe所在的document对象，但是悲剧的是，ie6-ie7并不支持这个属性。
+
+ie6和ie7还可以使用document.frames[“iframe Name”]或者document.frames[“iframe ID”]来获取相当于contentWindow属性，而firefox和chrome并不支持这些document.frames[“iframe Name”]或者document.frames[“iframe ID”]，但是window.frames[“iframe Name”]或window.frames[index]（index是索引值）也支持所有主流浏览器；
+
+我们知道document对象是window对象的一个子对象，所以我们可以通过document.getElementById(“iframe ID”).contentWindow.document来获取iframe的document对象，相当于contentDocument属性。
+
+##二、iframe里的js操作父级窗口的dom
+iframe里的js要操作父级窗口的dom，必须搞懂几个对象：
+
+* parent是父窗口（如果窗口是顶级窗口，那么parent==self==top）
+* top是最顶级父窗口（有的窗口中套了好几层frameset或者iframe）
+* self是当前窗口（等价window）
+* opener是用open方法打开当前窗口的那个窗口
+
+这样iframe里的js要操作父级窗口的dom可以通过parent，top这些对象来获取父窗口的window对象，例如：parent.document.getElementById(“dom ID”)；
+parent，top还能调用父级窗口的的js方法，比如，getIFrameDOM(iID）是父级窗口的一个方法，那么iframe里可以使用parent.getIFrameDOM(“wIframeA”)来调用父级窗口的getIFrameDOM(iID）方法
+
+demo(在服务环境中运行)：
+index.html
+iframeA.html
+iframeB.html
+##index.html
+
+```html
+<body>
+    <h1 style="text-align:center">JS操作iframe里的dom</h1>
+    <p style="text-align:center;">
+        <input type="button" value="父窗口操作iframeA" id="aa" onclick="iframeA();">
+        <input type="button" value="将父窗口的h1标签内的代码复制到iframeA中" onclick="iframeC();">
+    </p>
+    <div id="pHello" style="text-align:center">此处可通过iframeB的JavaScript函数，来替换哦~</div>
+    <iframe id="iframeA" src="iframeA.html" frameborder="0"></iframe>
+    <iframe id="iframeB" src="iframeB.html" frameborder="0"></iframe>
+</body>
+<script>
+    function iframeA() {
+        alert('aa');
+        getIFrameDOM("iframeA").getElementById('hello').style.background = "red";
+    }
+    function getIFrameDOM(iID) {
+        return document.getElementById(iID).contentWindow.document;
+    }
+    function iframeC() {
+        getIFrameDOM("iframeA").getElementById('hello').innerHTML = document.getElementsByTagName("h1")[0].innerHTML;
+    }
+    
+</script>
+```
+
+##iframeA.html
+
+```html
+<body>
+    <h1>I am iframe A</h1>
+    <h3 id="hello">父窗口操作iframeA</h3>
+    <p id="hello2">晕死，法国队真完蛋了！</p>
+</body>
+```
+
+##iframeB.html
+
+```html
+<body>
+    <h1>I am iframe B</h1>
+    <p style="text-align:center;">
+        <input type="button" value="iframeB子窗口操作父窗口" onclick="child4parent();">
+        <input type="button" value="iframeB操作子窗口A" onclick="child4child();">
+    </p>
+</body>
+<script>
+    function getIFrameDOM(iID) {
+        return document.getElementById(iID).contentWindow.document;
+    }
+    function child4child() {
+        var parentDOM = parent.getIFrameDOM("iframeA");
+        parentDOM.getElementById('hello2').innerHTML =
+            "<span style='color:blue;font-size:18px;background:yellow;'>英格兰的运气不错！</span>";
+    }
+    function child4parent() {
+        parent.document.getElementById("pHello").innerHTML =
+            "<p style='background:#000;color:#fff;font-size:15px;'>本届世界杯强队不强，弱队不弱！</p>";
+    }
+</script>
+```
+
+原文地址：http://www.css88.com/archives/2343
+线上列子：http://www.css88.com/demo/iframe-correspond/
+

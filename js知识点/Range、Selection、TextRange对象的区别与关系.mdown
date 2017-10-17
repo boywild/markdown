@@ -1,0 +1,54 @@
+###Range、Selection、TextRange对象的区别与关系
+
+###什么是Range
+所谓`Range`，是指`HTML`文档中任意一段内容。一个`Range`的起始点和结束点位置任意，甚至起始点和结束点可以是一样的（也就是空`Range`）。**最常见的Range是用户文本选择范围(`user text selection`)**。当用户选择了页面上的某一段文字后，你就可以把这个选择转为`Range`。当然，你也可以直接用程序定义`Range`。每一个浏览器窗口及**每一个窗口中都有一个`selection`对象，代表用户鼠标在页面中所选取的区域。**
+
+###什么是Selection
+`Selection`对象一般由`window.getSelection()`或其他方法产生。它代表页面中的文本选区，可能横跨多个元素。文本选区由用户拖拽鼠标经过文字而产生。 如果你想了解关于其他容纳纯文本的表单元素中的选区操作。Selection对象所对应的是用户所选择的 `ranges`（区域），俗称拖蓝。默认情况下，该函数只针对一个区域。
+**`Selection`简单点来说就是用户通过鼠标拖拽出来的文本区域**
+
+###什么是TextRange
+大多情况下，你希望`Range`对象就代表用户选择区域。在微软IE模式下已经是这样了，`userSelection`就是一个`TextRange`对象，然而，在`W3C`的标准浏览器下，`userSelection`仍然是一个`Selection`对象。创建`Range`对象，我们要这么处理
+
+```js
+var rangeObject = getRangeObject(userSelection);
+
+function getRangeObject(selectionObject) {
+    if (selectionObject.getRangeAt) return selectionObject.getRangeAt(0);
+    else { // Safari!
+        var range = document.createRange();
+        range.setStart(selectionObject.anchorNode, selectionObject.anchorOffset);
+        range.setEnd(selectionObject.focusNode, selectionObject.focusOffset);
+        return range;
+    }
+}
+```
+所以说TextRange是Range对象在IE下代表用户选择的区域`document.selection.createRange()`
+例：获得用户选择内容
+
+```js
+var userSelection;
+if (window.getSelection) { //现代浏览器
+    userSelection = window.getSelection();
+} else if (document.selection) { //IE浏览器 考虑到Opera，应该放在后面
+    userSelection = document.selection.createRange();
+}
+```
+
+###三者之间的关系
+`range`和`selection`的关系，`range`是一个范围比`selection`宽广的对象，两者是两个完全不同的对象。虽然说`range`和`selection`是两个不同对象，但是为了好理解，可以简单的理解为`range`对象包含`selection`对象。因为，`range`对象可以通过`selection`对象来获得，即，用户只要用鼠标拖拽选中一行文本，就能通过这行选中的文本创建一个`range`对象。如果用户没有通过鼠标拖拽的方式选中文本，也可以通过`Document` 对象的`createRange`方法创建一个range对象，**一旦创建了`Range`对象，我们就可以通过它对所选文本或者`html`内容进行拷贝、修改或者删除操作**
+而`TextRange`对象就是`Range`对象在`IE`下特殊的表现
+
+###创建Range的2种方法：
+1、 通过selection创建
+
+```js
+var selection=window.getSelection();
+var range=selection.getRangeAt(0);
+```
+
+2、通过`Document` 对象的`createRange`方法创建
+
+```js
+var range=document.createRange();
+```

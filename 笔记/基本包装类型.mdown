@@ -1,0 +1,187 @@
+###**重难点**
+
+* `String`的几种重要的方法
+1、`charAt()`
+2、`charCodeAt()`
+3、`concat()`
+4、`slice()`
+5、`substring()`
+6、`sbustr()`
+7、`split()`
+8、`indexOf()`
+9、`lastIndexOf()`
+10、`tirm()`
+
+
+**特殊的引用类型叫基本包装类型**
+基本包装类型有3种：
+**Number** **Boolean** **String**
+###**一、Boolean类型**
+先来看一个例子
+```js
+
+	var falseObject=new Boolean(false);
+	var result=falseObject&&true;
+	alert(result); //alert(true);
+
+	var falseObject=false;
+	var result=falseObject&&true;
+	alert(result);//alert(false);
+```
+在布尔运算中，false&&true等于false。可是，实例中运行的这样代码是对`falseObject`进行取值，而不是对`falseObject`它的值进行取值。**布尔表达式中的所有对象都会被转换为`true`**,因此`falseObject`对象在布尔表达式中代表的是true。
+###**二、Number类型**
+Number有一些静态属性，可直接调用无须new运算符和方法
+
+| 属性              | 描述       |
+| -                 |            |
+| MAX_VALUE         | 表示最大数 |
+| MIN_VALUE         | 表示最小数 |
+| NaN               | 非负数     |
+| NEGATIVE_INFINLTY | 负无穷大   |
+| POSITIVE_INFINLTY | 正无穷大   |
+
+**Number对象的属性和方法**
+
+| 方法            | 描述                                           |
+| -               |                                                |
+| tostring()      | 将数值转化为字符串，且可转静止                 |
+| toLocalString() | 根据本地数字格式转化为字符串                   |
+| toFixed()       | 保留小数点后制定位数并转化为字符串             |
+| toExponential() | 将数字一指数形式保存，保留小数点后指定位数小数 |
+| toPrecision()   | 以指数形式或点形式保留小数点                   |
+
+###**三、string类型**
+```js
+
+	var s1='some text';
+	var s2=s1.substring(2);
+```
+对于上述例子，基本类型不是对象，从逻辑上讲不应该有方法。其实这是后台自动完成了一系列的处理：
+1、 创建一个String类型的一个实例；
+2、 在实例上调用指定的方法；
+3、 销毁这个实例；
+可以将以上三个步骤想象成是执行了下列代码：
+```js
+
+	var s1=new String('some text');
+	var s2=s1.substring(2);
+	s1=null;
+```
+经过此番处理，基本的字符串值就变得跟对象一样了，而且，上面这三个步骤也分别适用于Boolean、和Number类型对应的布尔值和数字
+
+**引用类型和基本包装类型的主要区别就是对象的生存周期**，使用New操作符创建的引用类型的实例，在执行流离开当前作用域之前都一直保存在内存中。而自动创建的基本包装类型的对象，则只存在于一行代码执行的瞬间，然后立即被销毁，这意味着我们不能在运行时为基本类型值添加属性和方法。
+```js
+
+	var s1='some text';
+	s1.color='red';
+	alert(s1.color);//undefined
+```
+上述代码在执行第三行的时候color属性就不见了，问题的原因就是第二行闯将的String对象**在执行第三行代码时已经被销毁掉了**。**第三行代码又创建自己的String对象**，而该对象没有color属性
+
+**1、字符串方法**
+
+* `charAt()`该方法返回指定位置上的字符串，传入的索引从0开始
+* `charCodeAt()`该方法返回指定位置上的字符串编码，传入的索引从0开始
+
+**2、字符串操作方法**
+
+* `contact(str1,...,strn)`专门用来拼接字符串的方法
+* `slice(n,m)`、`subString(n,m)`、`sbuStr(n,m)`，**这三个方法都是基于子字符串创建新字符串**，而且也都接受一个或者两个参数。第一个参数指定子字符串的开始位置，第二个参数(在指定的情况下)表示子字符串到哪里结束。`slice()`、`subString()`这两个方法的第二个参数表示最后一个字符串到哪里结束，而`sbuStr()`的第二个参数表示需要截取子字符串的个数
+###**这里着重介绍下字符串的操作方法
+* **当参数为正数的情况下**
+①有1个参数
+
+```js
+
+	var str='hellow world';
+	//从索引值为3的位置一直取到最后一位，包括最后一位
+	str.slice(3);
+	//从索引值为3的位置一直取到最后一位，包括最后一位
+	str.subString(3);
+	//从索引值为3的位置一直取到最后一位，包括最后一位
+	str.sbuStr(3);
+```
+②有2个参数
+```js
+
+	var str='hellow world';
+	//从索引值为3的位置一直取到索引值为5的位置，不包括索引值为5的那一位
+	str.slice(3,5);
+	//从索引值为3的位置一直取到索引值为5的位置，不包括索引值为5的那一位
+	str.subString(3,5);
+	//从索引值为3的位置向后取5个字符
+	str.sbuStr(3,5);
+```
+* **当参数为负数的情况下**
+①有1个参数
+```js
+
+	var str='hellow world';
+	//取得从(str.length+(-3))位开始之后所有字符
+	str.slice(-3);
+	//负值返回全部
+	str.subString(-3);
+	//取得从(str.length+(-3))位开始之后所有字符
+	str.sbuStr(-3);
+```
+②有2个参数
+```js
+
+	var str='hellow world';
+	//取得从3到(str.length+(-1))位开始之间的所有字符，不包括(str.length+(-1))这一位。(3,5)
+	str.slice(3,-1);
+	//二参为负，直接转 0，并且方法会把较小的数字提前， (0,3)
+	str.subString(3,-1);
+	//二参数为负，直接转0 (3,0)
+	str.sbuStr(3,-1);
+```
+
+**3、字符串的位置方法**
+
+* `indexOf(str,n)`从一个字符串中**从前向后**搜索给定子字符串的位置，搜索不到则返回-1
+* `lastIndexOf(str,n)`从一个字符串中**从后向前**搜索给定子字符串的位置，搜索不到则返回-1
+这两个方法都接收第二个参数，表示**从字符串中的那个位置开始搜索**
+
+```js
+
+	var str='hellow world';
+	console.log(str.indexOf('o'));//4
+	console.log(str.lastIndexOf('o'));//8
+```
+`lastIndexOf`从字符串最后一位开始向字符串开始的位置查找`o`,查找到第一个`o`便停止，然后从字符串开始的位置数这个`o`所在的索引位置
+
+```js
+
+	var str='hellow world';
+	console.log(str.indexOf('o',6));//7
+	console.log(str.lastIndexOf('o',6));//4
+```
+`lastIndexOf`从字符串的最后一位向前数6位也就是`  world`，数出来的这6位数不参加索引，也就是说只有`hellow`参加索引
+
+**4、`trim()`方法**
+该方法会创建一个字符串的副本，删除前置及后缀的所有空格，然后返回结果
+
+```js
+
+	var str='  hellow world  ';
+	var trimStr=str.trim();
+	console.log(str);//'  hellow world  '
+	console.log(trimStr);//'hellow world'
+```
+
+**5、字符串转换方法**
+
+* `toLowerCase()`
+* `toLocaleLowerCase()`
+* `toUpperCase()`
+* `toLocaleUpperCase()`
+
+**6、字符串匹配方法**
+
+* `match()`
+* `search()`
+* `replace()`
+
+**7、`localeCompare()`**
+
+**8、`fromCharCode()`**

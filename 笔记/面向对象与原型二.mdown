@@ -1,0 +1,75 @@
+###构造函数+原型模式
+为了解决构造函数传参和共享问题，衍生出组合构造函数+原型模式。简而言之就是需要独立的部分用构造函数，需要共享的部分用原型。
+**优点：**这种模式很好的解决了传参和引用共享的大难题。是创建对象比较好的方法。
+
+```js
+function Box(name, age) {//不共享的使用构造函数
+	this.name = name;
+	this.age = age;
+	this. family = ['父亲', '母亲', '妹妹'];
+};
+Box.prototype = {//共享的使用原型模式
+	constructor : Box,
+	run : function () {
+		return this.name + this.age;
+	}
+};
+var box1=new Box('lee',100);
+alert(box1.run());//lee100
+box1.family.push('哥哥');//在实例中添加'哥哥'
+alert(box1.family());//['父亲', '母亲', '妹妹','哥哥']
+var box2=new Box('jack',200);
+alert(box2.run());//jack200
+alert(box2.family());//['父亲', '母亲', '妹妹']
+```
+###动态原型模式
+**动态原型模式是组合构造函数+原型模式封装后的形式**
+将原型封装到构造函数中
+
+```js
+function Box(name ,age) {//将所有信息封装到函数体内
+	this.name = name;
+	this.age = age;
+	
+	if (typeof this.run != 'function') {//仅在第一次调用的初始化
+		Box.prototype.run = function () {
+			return this.name + this.age + '运行中...';
+		};
+	}
+}
+
+var box = new Box('Lee', 100);
+alert(box.run());
+```
+PS：使用组合构造函数+原型模式，动态原型模式，要注意一点，不可以再使用字面量的方式重写原型，因为会切断实例和新原型之间的联系。
+
+###寄生构造模式(工厂模式+构造函数模式)
+```js
+function Box(name ,age) {//将所有信息封装到函数体内
+	var obj=new Object();
+	obj.name = name;
+	obj.age = age;
+	obj.run=function(){
+		return this.name+this.age;
+	}
+	return obj;
+}
+```
+###稳妥构造函数
+在一些安全环境中，比如禁止使用`this`和`new`。这里的`this`是构造函数里不能使用`this`，这里的`new`是外部实例化构造函数时不使用`new`，这种创建方式就叫稳妥构造函数
+
+```js
+function Box(name , age) {
+	var obj = new Object();
+	obj.name = name;
+	obj.age = age;
+	obj.run = function () {
+		return name + age + '运行中...';//直接打印参数即可
+	};
+	return obj;
+}
+
+var box = Box('Lee', 100);//直接调用函数
+alert(box.run());
+```
+PS：稳妥构造函数和寄生类似。只是稳妥构造函数不使用`this`和`new`

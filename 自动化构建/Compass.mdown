@@ -1,0 +1,44 @@
+##Compass
+
+###compass常用命令
+| 命令             | 解释                    |
+| -                |                         |
+| compass create   | 创建新Compass项目       |
+| compass init     | 为已存在项目添加compass |
+| compass clean    | 移除已生成的文件和缓存  |
+| compass compile  | 生成样式表文件          |
+| compass watch    | 监视sass文件并自动编译  |
+| compass stats    | 查看样式表统计数据      |
+| compass validate | 验证生成的CSS文件       |
+
+###Gulp监听Compass
+
+```js
+var gulp = require('gulp'),
+	compass = require('gulp-compass'),
+	mincss=require('gulp-minify-css');
+
+gulp.task('css',function(){
+	//编译css
+	//压缩css
+	 gulp.src('./sass/*.scss')
+	    .pipe(compass({
+	      config_file: './config.rb',
+	      css: 'stylesheets',
+	      sass: 'sass'
+	    }))
+	    .pipe(mincss())
+	    .pipe(gulp.dest('stylesheets'));
+});
+
+gulp.task('watch',function(){
+	gulp.watch('./sass/*.scss',['css'])
+});
+
+gulp.task('default',['watch'],function() {
+  // 将你的默认的任务代码放在这
+  console.log("task default");
+});
+```
+[gulp-compass](https://github.com/appleboy/gulp-compass)
+[npm插件](http://npmsearch.com/)

@@ -1,0 +1,408 @@
+##一、引入sea.js
+	<script type="text/javascript" src="js/sea.js"></script>
+
+##二、如何变成模块
+用`define(function(require,exports,module){})`包裹
+require模块之间依赖的接口
+exports对外提供方法的接口
+
+
+	define(function(require,exports,module) {
+		function show(){
+			alert('aa');
+		}
+	});
+
+##三、如何调用模块
+`exports`用来对外提供接口
+
+	define(function(require,exports,module) {
+		function show(){
+			alert('aa');
+		}
+		exports.show=show;
+	});
+
+##四、如何使用模块
+`seajs.use('module.js',function(ex){})`，第一个参数是请求模块的路径`module.js`，第二个参数是请求完成后的回调函数`function(ex){}`，回调用有一个参数`ex`，这个参数就是模块提供的接口
+默认根目录是`sea.js`所在的目录。如果想以当前页面所在的目录为根目录，那么只需要加上相对表示符`./`
+
+	seajs.use('module.js');
+	seajs.use('./js/module.js',function(ex){
+		ex.show();
+	});
+
+##五、如何依赖模块(模块与模块之间进行调用,即依赖关系)
+通过`require('./module3.js')`来加载依赖
+①如果module3.js是一个普通的模块(即**没有**用`define(function(require,exports,module){})`包裹起来的模块)可以通过如下方式来加载依赖：
+
+	define(function(require,exports,module) {
+		require('./module3.js');
+		function show(){
+			alert(a)
+		}
+		exports.show=show;
+	});
+
+②如果`module3.js`是一个标准的seajs模块(即**用**`define(function(require,exports,module){})`包裹起来的模块)，当引入依赖依赖模块时，`require`执行完的结果就是`exports`
+在控制台打印`require('./module3.js')`，会发现打印出来的是一个对象 `Object {a: 100}`，所以要通过如下方式来加载依赖：
+
+	define(function(require,exports,module) {
+		var a=require('./module3.js').a;
+		function show(){
+			alert(a)
+		}
+		exports.show=show;
+	});
+
+##六、Grunt构建(grunt-cmd-contact grunt-cmd-transport contrib-clean)
+如果用构建工具合并所有的模块之后，模块将会多两个参数 `id`、`[]`。分别表示，当前模块的`标识(id)`和当前模块的`依赖([])`。**注意：**依赖是一个数组可以为空
+`define(id,['',''],function(require,exports,module){})`
+
+##七、use如何引用多个模块
+如果想用`use`同时引入多个模块，就需要用一个数组来存放依赖，如下。回调函数中的参数，分别代表对应的模块提供的方法即`ex1==module.exports==exports`
+
+	seajs.use(['./js/module1.js','./js/module2.js'],function(ex1,ex2) {
+		ex1.show();
+		ex2.show();
+	});
+
+##八、sea加ID有利于提取
+	<script type="text/javascript" src="js/sea.js"></script>	
+##九、如何改造文件为CMD模块
+用`define(function(require,exports,module){})`包裹，并输出相应的接口`exports.show=show;`
+
+##十、调试接口cache
+	seajs.cache
+
+##十一、模块标识
+模块标识是一个字符串，用来标识模块。在 require、 require.async 等加载函数中，第一个参数都是模块标识。
+
+1、一个模块标识由斜线`(/)`分隔的多项组成。
+2、每一项必须是小驼峰字符串、 `.` 或 `..` 。
+3、模块标识可以不包含文件后缀名，比如 `.js `。
+4、模块标识可以是 相对 或 顶级 标识。如果第一项是 `.` 或 `..`，则该模块标识是相对标识。
+5、顶级标识根据模块系统的基础路径来解析。
+6、相对标识相对 `require` 所在模块的路径来解析。
+
+注意，符合上述规范的标识肯定是 `Sea.js` 的模块标识，但 `Sea.js` 能识别的模块标识不需要完全符合以上规范。 比如，除了大小写字母组成的小驼峰字符串，`Sea.js` 的模块标识字符串还可以包含下划线`_`和连字符`-`， 甚至可以是 `http://`、`https://`、`file:///` 等协议开头的绝对路径。
+
+###11.1相对标识
+**相对标识以 `. `开头，只出现在模块环境中（d`efine` 的 `factory` 方法里面）。相对标识永远相对当前模块的 `URI` 来解析**
+
+	// 在 http://example.com/js/a.js 的 factory 中：
+	require.resolve('./b');
+	  // => http://example.com/js/b.js
+
+	// 在 http://example.com/js/a.js 的 factory 中：
+	require.resolve('../c');
+	  // => http://example.com/c.js
+
+###11.2顶级标识
+**顶级标识不以点（.）或斜线（/）开始， 会相对模块系统的基础路径（即 `Sea.js` 的 `base` 路径）来解析**
+1、假设 `base` 路径是：`http://example.com/assets/`
+在模块代码里：
+
+	require.resolve('gallery/jquery/1.9.1/jquery');
+	  // => http://example.com/assets/gallery/jquery/1.9.1/jquery.js
+
+2、模块系统的基础路径即 base 的默认值，与 sea.js 的访问路径相关
+如果 sea.js 的访问路径是`http://example.com/assets/sea.js`则 base 路径为`http://example.com/assets/`
+3、当 sea.js 的访问路径中含有版本号时，base 不会包含 seajs/x.y.z 字串。 当 sea.js 有多个版本时，这样会很方便。
+如果 sea.js 的路径是：`http://example.com/assets/seajs/1.0.0/sea.js`则 base 路径是：`http://example.com/assets/`
+
+4、当然，也可以手工配置 base 路径：
+
+	seajs.config({
+	  base: 'http://code.jquery.com/'
+	});
+
+	// 在模块代码里：
+	require.resolve('jquery');
+	  // => http://code.jquery.com/jquery.js
+
+###11.3普通路径
+**除了相对和顶级标识之外的标识都是普通路径。普通路径的解析规则，和 HTML 代码中的 `<script src="..."></script>` 一样，会相对当前页面解析。**
+假设当前页面是 `http://example.com/path/to/page/index.html`
+
+	// 绝对路径是普通路径：
+	require.resolve('http://cdn.com/js/a');
+	  // => http://cdn.com/js/a.js
+
+	// 根路径是普通路径：
+	require.resolve('/js/b');
+	  // => http://example.com/js/b.js
+
+	// use 中的相对路径始终是普通路径：
+	seajs.use('./c');
+	  // => 加载的是 http://example.com/path/to/page/c.js
+
+	seajs.use('../d');
+	  // => 加载的是 http://example.com/path/to/d.js
+
+提示：
+1、顶级标识始终相对 base 基础路径解析。
+2、绝对路径和根路径始终相对当前页面解析。
+3、require 和 require.async 中的相对路径相对当前模块路径来解析。
+4、seajs.use 中的相对路径始终相对当前页面来解析。
+
+##十二、如何改造现有文件为 CMD 模块
+###12.1、改造主流模块这里指的是 jQuery、Moment、Backbone、underscore 等业界主流模块
+这些模块一般都有对 AMD 和 CommonJS 的支持代码，例如 jQuery 源文件的最后几行
+
+```js
+if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+    module.exports = jQuery;
+} else {
+    window.jQuery = window.$ = jQuery;
+
+    if ( typeof define === "function" && define.amd ) {
+        define( "jquery", [], function () { return jQuery; } );
+    }
+}
+```
+还有 Backbone 里
+
+```js
+var Backbone;
+if (typeof exports !== 'undefined') {
+  Backbone = exports;
+} else {
+  Backbone = root.Backbone = {};
+}
+```
+**对于有这些兼容代码的，只需要去掉 `define.amd`的支持，或是直接包装上 `define` 就可以了。**
+
+```js
+define(function(require, exports, module) {
+  // code here ...
+});
+```
+**如果没有模块化的兼容代码，有时候需要手动引入依赖，以及暴露对应的接口。**
+
+```js
+define(function(require, exports, module) {
+  var $ = require('$');
+  // code here ...
+  module.exports = Placeholders;
+});
+```
+
+###12.2、现有的 JS 文件
+对于一些现有的普通 JS 文件，相对简单的多，参考 CMD 的书写规范，把那些暴露到全局命名空间的接口用 CMD 的方式进行改造就可以了。
+
+###12.3、改造 jQuery 插件
+**我们推荐以下的包装方式：**
+
+```js
+// jquery-plugin-abc
+define(function(require, exports, module) {
+  var $ = require('$');
+  // 插件的代码
+  $.fn.abc = function() {};
+});
+```
+这样的改造方式实际上是强化了原有的 $ 对象（而不是重新包装出一个新的 $），在实际调用时，可以用下面的方式：
+
+```js
+seajs.use(['$', 'jquery-plugin-abc'], function($) {
+  // $ 有了 jquery-plugin-abc 所提供的插件功能
+  $.abc();
+});
+```
+
+##十三、配置
+`seajs.config(options)`
+
+```js
+seajs.config({
+
+  // 别名配置(当模块标识很长时，可以使用 alias 来简化)
+  alias: {
+    'es5-safe': 'gallery/es5-safe/0.9.3/es5-safe',
+    'json': 'gallery/json/1.0.2/json',
+    'jquery': 'jquery/jquery/1.10.1/jquery'
+  },
+
+  // 路径配置(当目录比较深，或需要跨目录调用模块时，可以使用 paths 来简化书写)
+  paths: {
+    'gallery': 'https://a.alipayobjects.com/gallery'
+  },
+
+  // 变量配置(有些场景下，模块路径在运行时才能确定，这时可以使用 vars 变量来配置)
+  vars: {
+    'locale': 'zh-cn'
+  },
+
+  // 映射配置(该配置可对模块路径进行映射修改，可用于路径转换、在线调试等)
+  map: [
+    ['http://example.com/js/app/', 'http://localhost/js/app/']
+  ],
+
+  // 预加载项(使用 preload 配置项，可以在普通模块加载前，提前加载并初始化好指定模块)
+  preload: [
+    Function.prototype.bind ? '' : 'es5-safe',
+    this.JSON ? '' : 'json'
+  ],
+
+  // 调试模式(值为 true 时，加载器不会删除动态插入的 script 标签。插件也可以根据 debug 配置，来决策 log 等信息的输出。)
+  debug: true,
+
+  // Sea.js 的基础路径(Sea.js 在解析顶级标识时，会相对 base 路径来解析)
+  base: 'http://example.com/path/to/base/',
+
+  // 文件编码(获取模块文件时，<script> 或 <link> 标签的 charset 属性。 默认是 utf-8)
+  charset: 'utf-8'
+});
+```
+##十四、ID 和路径匹配原则 (注意：这是一个万人坑)
+所谓 ID 和路径匹配原则 是指，使用 `seajs.use` 或 `require` 进行引用的文件，如果是具名模块（即定义了 `ID` 的模块），会把 `ID` 和 `seajs.use` 的路径名进行匹配，如果一致，则正确执行模块返回结果。反之，则返回 `null`。例如：
+
+```js
+seajs.use('lib/jquery', function($) {
+    // use $
+});
+```
+
+或者在模块中 require ：
+
+```js
+define(function(require, exports, module) {
+    var $ = require('lib/jquery');
+    // use $
+});
+```
+当 `jQuery` 文件是下面的情况时，上述的变量 `$` 能拿到正确的返回结果。
+
+```js
+// 文件路径是 lib/jquery.js
+// ID 和实际路径匹配了（.js 后缀会自动补上）
+define('lib/jquery', function(require, exports, module) {
+    // jquery code
+});
+```
+下面的代码则返回 null：
+
+```js
+// 文件路径是 lib/jquery.js
+// 但是 ID 是 lib/jquery.min.js
+// ID 和路径不匹配
+define('lib/jquery.min', function(require, exports, module) {
+    // jquery code
+});
+```
+
+而匿名模块始终能正确返回结果：
+
+```js
+// lib/jquery.js
+// 匿名模块，不需要进行匹配
+// 但是文件中只能有一个 define 块
+define(function(require, exports, module) {
+    // jquery code
+});
+```
+注意这里用于匹配的 `ID` 都是经过 `alias` 和 `path` 解析并且补完后缀之后的。为什么要有这个原则
+首先，`Sea.js` 的模块启动接口秉承的是路径即 `ID` 的设计原则。`seajs.use` 的方法的第一个参数被规定为文件路径（而不是 `ID`），这样的设计减轻了记忆模块 `ID` 的负担，无论是匿名模块还是具名模块，开发者只需要知道文件放在哪儿就行了。
+进一步的，之所以有这个 `ID` 和路径匹配原则，是因为在 `CMD` 的书写规范中，一个文件对应一个模块，所有的模块都是匿名模块（即 `define(factory) `的形式）。那么当 `seajs.use` 某模块时，这个模块对应的文件里的唯一的 `define` 方法理所当然的是这个模块的执行代码，这时可以正确返回结果。
+但是在生产环境下，静态文件不可避免地需要进行合并打包或者进行 `combo`，以优化请求数提高页面性能。这时，一个 `js` 文件可能有很多 `define()` 方法。
+
+```js
+define(funtion(require, exports, module) {
+    // module a
+});
+
+define(funtion(require, exports, module) {
+    // module b
+});
+
+define(funtion(require, exports, module) {
+    // module c
+});
+```
+
+那么请问，当 `seajs.use` 这个文件时，应该返回哪个模块？
+所以这时候 ID 就派上了用场，我们可以这样写：
+
+```js
+// path/a.js
+
+define('path/a', funtion(require, exports, module) {
+    // module a
+});
+
+define('path/b', funtion(require, exports, module) {
+    // module b
+});
+
+define('path/c', funtion(require, exports, module) {
+    // module c
+});
+```
+
+我们定义好每个模块的 `id` ，在 `Sea.js` 里，那个和文件路径匹配的 `ID`的模块就是这个文件的主模块。此时：
+
+```js
+seajs.use('path/a', function(a) {
+    // got a, not b or c
+});
+```
+
+这个原则保证了我们能够自由合并模块来优化性能，`seajs-combo` 和 `spm-build` 的构建机制都是基于此原则。
+在 `RequireJS` 中，也有类似的原则：`http://requirejs.org/docs/errors.html#mismatch`更深一步可能有人要问为啥一定要把 `ID` 定为文件路径，`Sea.js` 不是可以自定义 `ID` 吗，像下面这样：
+
+```js
+define('module-id', funtion(require, exports, module) {
+    // module id
+});
+
+// 然后就可以
+seajs.use('module-id', function(Module) {
+    // Module
+});
+```
+
+上面的代码当然可以运行。但是有一点，任何一个模块的运行都涉及到两个步骤：模块定义 和 模块执行，上面的代码两个步骤都包括在内。而使用了 `Sea.js` ，我们不希望用户去手动写 script 标签引用模块。希望只需要 `seajs.use` 模块的文件路径即可（入口唯一）：
+
+```js
+seajs.use('path/to/module', function(Module) {
+    // Module
+});
+```
+
+`Sea.js` 会自动插入 `script` 标签，完成定义步骤，然后执行模块，拿到模块的输出。所以当一个文件里有多个 `define` 时，只能用 `ID` 是否匹配 `use` 中的路径来判断是否主模块。
+当然可以回避掉这个原则，你只需要自己负责模块的定义部分，再自己 `seajs.use` 之前定义好的模块 `ID` 就行。
+
+```js
+<!-- 各种模块的定义 define define define -->
+<script src="http://example.com/modules.js"></script>
+
+<script>
+// 这时 use 的第一个参数就可以不必是文件路径了，因为已经有定义好的模块 ID 了
+seajs.use('jquery', function($) {
+    // $
+});
+</script>
+```
+
+或者通过 `alias` 来帮助 `ID` 匹配上最终的路径，这样就和 `RequireJS` 的方案基本一致了。
+
+```js
+  // lib/jquery-1.7.2.js 的内容如下
+define('$', funtion(require, exports, module) {
+  // jQuery
+});
+```
+这样就不需要自己去引用上面的文件，可以直接通过 `seajs.use` 调用。
+
+```js
+seajs.config({
+  alias: {
+    $: 'lib/jquery-1.7.2.js'
+  }
+});
+
+seajs.use('$', function() {
+  // Got $ !
+});
+```

@@ -1,0 +1,273 @@
+###所有属性
+
+####**Flex属性**
+* `display:flex | flexbox | box`
+* `flex-direction:row | row-reverse | column | column-reverse`
+* `flex-wrap:nowrap | wrap | wrap-reverse`
+* `flex-flow:flex-direction,flex-wrap`
+* `justify-content:flex-start | flex-end | center | space-between | space-around`
+* `align-items:flex-start | flex-end | center | baseline | stretch`
+* `align-content:flex-start | flex-end | center | space-between | space-around | stretch`
+
+####**Flex项目属性**
+* `flex-grow:<number>`
+* `flex-shrink:<number>`
+* `flex-basis:<length> | auto`
+* `flex:none | [<'flex-grow'> <'flex-shrink'>? || <'flex-basis'>]`
+* `align-self:auto | flex-start | flex-end | center | baseline | stretch`
+
+下面逐条对以上属性进行解释
+####**display**
+<kbd>**定义一个Flex容器，根据其取的值来决定是内联还是块。Flex容器会为其内容建立新的伸缩格式化上下文。**</kbd>
+
+```css
+.container {
+  display: flex; /* or inline-flex */
+}
+```
+开启Flex容器：让一个元素变成伸缩容器
+
+| 规范版本 | 属性名称 | 块伸缩容器 | 内联伸缩容器   |
+| -        |          |            |                |
+| 标准版本 | display  | flex       | inline-flex    |
+| 混合版本 | display  | flexbox    | inline-flexbox |
+| 最老版本 | display  | box        | inline-box     |
+
+####**flex-direction**
+<kbd>**这是用来创建方向，从而定义Flex项目在Flex容器中放置的方向。Flexbox是一种单方向的布局概念。认为Flex项目主要排列方式要么是水平排列，要么是垂直列排列**</kbd>
+
+```css
+.container {
+  flex-direction: row | row-reverse | column | column-reverse;
+}
+```
+伸缩流：指定伸缩容器主轴的伸缩流方向
+`row`(默认值):如果书写方式是ltr，那么Flex项目从左向右排列；如果书写方式是rtl，那么Flex项目从右向左排列
+`row-reverse`:如果书写方式是ltr，那么Flex项目从右向左排列；如果书写方式是rtl，那么Flex项目从左向右排列
+`column`:和row类似，只不过方向是从上到下排列
+`column-reverse`:和row-reverse类似，只不过方向是从下向上排列
+
+####**flex-wrap**
+<kbd>**默认情况之下，Flex项目都尽可能在一行显示。你可以根据flex-wrap的属性值来改变，让Flex项目多行显示。方向在这也扮演了一个重要角度，决定新的一行堆放方向**</kbd>
+
+```css
+.container{
+ 	flex-wrap: nowrap | wrap | wrap-reverse;
+}
+```
+`nowrap`(默认值):单行显示，如果书写方式是ltr，Flex项目从左向右排列，反之rtl，从右向左排列
+`wrap`:多行显示，如果书写方式是ltr，Flex项目从左向右排列，反之rtl，从右向左排列
+`wrap-reverse`:多行显示，如果书写方式是ltr，Flex项目从右向左排列，反之rtl，从左向右排列
+**换行：指定伸缩项目是否沿着侧轴排列**
+
+| 规范版本 | 属性名称  | 不换行 | 换行     | 反转换行     |
+| -        |           |        |          |              |
+| 标准版本 | flex-wrap | nowrap | wrap     | wrap-reverse |
+| 混合版本 | lex-wrap  | nowrap | wrap     | wrap-reverse |
+| 最老版本 | box-lines | single | multiple | N/A          |
+
+####**flex-flow(适用于flex容器元素)**
+<kbd>**这是flex-direction和flex-wrap两个属性的缩写。两个属性决定了伸缩容器的主轴与侧轴。默认值是row nowrap（中间用空格隔开）。**</kbd>
+
+```css
+.container{
+	flex-flow: flex-direction || flex-wrap
+}
+```
+####**justify-content(水平方向上对齐)**
+<kbd>**用于在主轴上对齐伸缩项目。这一行为会在所有可伸缩长度及所有自动边距均被解释后进行。当一行上的所有伸缩项目都不能伸缩或可伸缩但是已经达到其最大长度时，这一属性才会对多余的空间进行分配。当项目溢出某一行时，这一属性也会在项目的对齐上施加一些控制**</kbd>
+
+```css
+.container {
+	justify-content: flex-start | flex-end | center | space-between | space-around;
+}
+```
+`flex-start`(默认值):伸缩项目向一行的起始位置靠齐。该行的第一个伸缩项目在主轴起点边的外边距与该行在主轴起点的边对齐，同时所有后续的伸缩项目与其前一个项目对齐。
+`flex-end`:伸缩项目向一行的结束位置靠齐。该行的最后一个伸缩项目在主轴终点边的外边距与该行在主轴终点的边对齐，同时所有前面的伸缩项目与其后一个项目对齐。
+center:伸缩项目向一行的中间位置靠齐。该行的伸缩项目将相互对齐并在行中居中对齐，同时第一个项目与该行在主轴起点的边的距离等同与最后一个项目与该行在主轴终点的边的距离（如果剩余空间是负数，则保持两端溢出的长度相等）。
+`space-between`:伸缩项目会平均地分布在行里。如果剩余空间是负数，或该行只有一个伸缩项目，则此值等效于flex-start。在其它情况下，第一个项目在主轴起点边的外边距会与该行在主轴起点的边对齐，同时最后一个项目在主轴终点边的外边距与该行在主轴终点的边对齐，而剩下的伸缩项目在确保两两之间的空白空间相等下平均分布。
+`space-around`:伸缩项目会平均地分布在行里，两端保留一半的空间。如果剩余空间是负数，或该行只有一个伸缩项目，则该值等效于center。在其它情况下，伸缩项目在确保两两之间的空白空间相等，同时第一个元素前的空间以及最后一个元素后的空间为其他空白空间的一半下平均分布。
+
+**主轴对齐方式：指定伸缩项目沿主轴对齐方式**
+
+| 规范版本 | 属性名称        | start      | center | end      | justify       | distribute    |
+| -        |                 |            |        |          |               |               |
+| 标准版本 | justify-content | flex-start | center | flex-end | space-between | space-between |
+| 混合版本 | flex-pack       | start      | center | end      | justify       | distribute    |
+| 最老版本 | box-pack        | start      | center | end      | justify       | N/A           |
+
+####**align-items(竖直方向上对齐)**
+<kbd>**伸缩项目可以在伸缩容器的当前行的侧轴上进行对齐，这类似于justify-content属性，但是是另一个方向。align-items可以用来设置伸缩容器中包括匿名伸缩项目的所有项目的对齐方式。**</kbd>
+
+```css
+.container {
+	align-items: flex-start | flex-end | center | baseline | stretch;
+}
+```
+`flex-start`:伸缩项目在侧轴起点边的外边距紧靠住该行在侧轴起始的边。
+`flex-end`:伸缩项目在侧轴终点边的外边距靠住该行在侧轴终点的边 。
+`center`:伸缩项目的外边距盒在该行的侧轴上居中放置。（如果伸缩行的尺寸小于伸缩项目，则伸缩项目会向两个方向溢出相同的量）。
+`baseline`:如果伸缩项目的行内轴与侧轴为同一条，则该值和flex-start等效。其它情况下，该值将参与基线对齐。所有参与该对齐方式的伸缩项目将按下列方式排列：首先将这些伸缩项目的基线进行对齐，随后其中基线至侧轴起点边的外边距距离最长的那个项目将紧靠住该行在侧轴起点的边。
+`stretch`:如果侧轴长度属性的值为auto，则此值会使项目的外边距盒的尺寸在遵照min/max-width/height属性的限制下尽可能接近所在行的尺寸。
+**侧轴对齐方式：指定伸缩项目沿着侧轴对齐方式**
+
+| 规范版本 | 属性名称    | start center | end    | baseline | stretch  |         |
+| -        |             |              |        |          |          |         |
+| 标准版本 | align-items | flex-start   | center | flex-end | baseline | stretch |
+| 混合版本 | flex-align  | start center | end    | baseline | stretch  |         |
+| 最老版本 | box-align   | start center | end    | baseline | stretch  |         |
+
+####**align-content**
+<kbd>**当伸缩容器的侧轴还有多余空间时，align-content属性可以用来调准伸缩行在伸缩容器里的对齐方式，这与调准伸缩项目在主轴上对齐方式的justify-content属性类似。**</kbd>请注意本属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
+
+```css
+.container {
+	align-content: flex-start | flex-end | center | space-between | space-around | stretch;
+}
+```
+`flex-start`:各行向伸缩容器的起点位置堆叠。伸缩容器中第一行在侧轴起点的边会紧靠住伸缩容器在侧轴起点的边，之后的每一行都紧靠住前面一行。
+`flex-end`:各行向伸缩容器的结束位置堆叠。伸缩容器中最后一行在侧轴终点的边会紧靠住该伸缩容器在侧轴终点的边，之前的每一行都紧靠住后面一行。
+`center`:各行向伸缩容器的中间位置堆叠。各行两两紧靠住同时在伸缩容器中居中对齐，保持伸缩容器在侧轴起点边的内容边和第一行之间的距离与该容器在侧轴终点边的内容边与第最后一行之间的距离相等。（如果剩下的空间是负数，则行的堆叠会向两个方向溢出的相等距离。）
+`space-between`:各行在伸缩容器中平均分布。如果剩余的空间是负数或伸缩容器中只有一行，该值等效于flex-start。在其它情况下，第一行在侧轴起点的边会紧靠住伸缩容器在侧轴起点边的内容边，最后一行在侧轴终点的边会紧靠住伸缩容器在侧轴终点的内容边，剩余的行在保持两两之间的空间相等的状况下排列。
+`space-around`:各行在伸缩容器中平均分布，在两边各有一半的空间。如果剩余的空间是负数或伸缩容器中只有一行，该值等效于center。在其它情况下，各行会在保持两两之间的空间相等，同时第一行前面及最后一行后面的空间是其他空间的一半的状况下排列。
+`stretch`:各行将会伸展以占用剩余的空间。如果剩余的空间是负数，该值等效于flex-start。在其它情况下，剩余空间被所有行平分，扩大各行的侧轴尺寸。
+**伸缩项目行对齐方式：指定伸缩项目行在侧轴的对齐方式**
+
+| 规范版本 | 属性名称       | start      | center | end      | justify       | distribute   | stretch |
+| -        |                |            |        |          |               |              |         |
+| 标准版本 | align-content  | flex-start | center | flex-end | space-between | space-around | stretch |
+| 混合版本 | flex-line-pack | start      | center | end      | justify       | distribute   | stretch |
+| 最老版本 | N/A            | N/A        | N/A    | N/A      | N/A           | N/A          | N/A     |
+
+####**Flex项目属性**
+**`order`数值越小，排列越靠前，默认为0**
+<kbd>**默认情况，Flex项目是按文档源的流顺序排列。然而，在Flex容器中可以通过order属性来控制Flex项目的顺序源根据order重新排序伸缩项目。有最小（负值最大）order的伸缩项目排在第一个。若有多个项目有相同的order值，这些项目照文件顺序排。这个步骤影响了伸缩项目生盒树成的盒子的顺序，也影响了后面的演算法如何处理各项目**</kbd>
+
+```css
+.item {
+	order: <integer>;
+}
+```
+**显示顺序：指定伸缩项目的顺序**
+
+| 规范版本 | 属性名称   | 属性值 |
+| -        |            |        |
+| 标准版本 | order      | number |
+| 混合版本 | flex-order | number |
+| 最老版本 | flex-order | number |
+
+####**`flex-grow`属性定义项目的放大比例，默认为0，即如果存在剩余空间，也不放大**
+<kbd>**如果有必要的话，flex-grow可以定义一个Flex项目的扩大比例。它接受一个没有单位的值作为一个比例。它可以使用Flex项目完全占用Flex容器可用的空间。如果所有Flex项目的flex-grow设置为1时，表示Flex容器中的Flex项目具有相等的尺寸。如果你给其中一个Flex项目设置flex-grow的值为2，那么这个Flex项目的尺寸将是其他Flex项目两倍（其他Flex项目的flex-grow值为1）**</kbd>
+
+```css
+.item {
+	flex-grow: <number>; /* default 0 */
+}
+```
+注意：flex-grow取负值将失效
+
+####**`flex-shrink`属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小**
+<kbd>**如果所有项目的flex-shrink属性都为1，当空间不足时，都将等比例缩小。如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小**</kbd>
+如果有必要，flex-shrink可以定义Flex项目的缩小比例
+
+```css
+.item {
+	flex-shrink: <number>; /* default 1 */
+}
+```
+注意：flex-grow取负值将失效
+
+####**flex-basis**
+<kbd>**flex-basis属性定义了Flex项目在分配Flex容器剩余空间之前的一个默认尺寸。main-size值使它具有匹配的宽度或高度，不过都需要取决于flex-direction的值**</kbd>
+
+```css
+.item {
+	flex-basis: <length> | auto; /* default auto */
+}
+```
+如果设置为0，内容不在考虑周围额外空间。如果设置为auto，额外空间会基于flex-grow值做分布
+
+####**align-self**
+<kbd>**align-self则用来在单独的伸缩项目上覆写默认的对齐方式。（对于匿名伸缩项目，align-self的值永远与其关联的伸缩容器的align-items的值相同。**</kbd>
+
+```css
+.item {
+	align-self: auto | flex-start | flex-end | center | baseline | stretch;
+}
+```
+若伸缩项目的任一个侧轴上的外边距为auto，则align-self没有效果。
+
+如果align-self的值为auto，则其计算值为元素的父元素的align-items值，如果该元素没有父元素，则计算值为stretch。对齐属性值的定义如下：
+`flex-start`:伸缩项目在侧轴起点边的外边距紧靠住该行在侧轴起始的边。
+`flex-end`:伸缩项目在侧轴终点边的外边距靠住该行在侧轴终点的边 。
+`center`:伸缩项目的外边距盒在该行的侧轴上居中放置。（如果伸缩行的尺寸小于伸缩项目，则伸缩项目会向两个方向溢出相同的量）。
+`baseline`:如果伸缩项目的行内轴与侧轴为同一条，则该值和flex-start等效。其它情况下，该值将参与基线对齐。所有参与该对齐方式的伸缩项目将按下列方式排列：首先将这些伸缩项目的基线进行对齐，随后其中基线至侧轴起点边的外边距距离最长的那个项目将紧靠住该行在侧轴起点的边。
+`stretch`:如果侧轴长度属性的值为auto，则此值会使项目的外边距盒的尺寸在遵照min/max-width/height属性的限制下尽可能接近所在行的尺寸。
+**单个伸缩项目侧轴对齐方式**
+
+| 规范版本 | 属性名称        | auto | start      | center | end      | baseline | stretch |
+| -        |                 |      |            |        |          |          |         |
+| 标准版本 | align-self      | auto | flex-start | center | flex-end | baseline | stretch |
+| 混合版本 | flex-item-align | auto | start      | center | end      | baseline | stretch |
+| 最老版本 | N/A             | N/A  | N/A        | N/A    | N/A      | N/A      | N/A     |
+
+注意：float，clear和vertical-align属性在Flex项目中无效
+
+####**flex**
+<kbd>**flex是flex-grow，flex-shrink和flex-basis三个属性的缩写。第二个和第三个参数((flex-shrink和flex-basis)是可选值。其默认值是0  1 auto**</kbd>
+
+```css
+.item {
+	flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]
+}
+```
+建议您 使用此简写属性，而不是设置单独属性。注意，如果flex取值为none时，其相当于取值为0 0 auto。
+请注意flex-grow与flex-basis的初始值与他们在flex缩写被省略时的 默认值不同。这里的设计是为了让flex缩写在最常见的情景下比较好用。
+**伸缩性：指定伸缩项目如何伸缩尺寸**
+
+| 规范版本 | 属性名称 | 属性值                                        |
+| -        |          |                                               |
+| 标准版本 | flex     | none / [flex-grow flex-shrink / flex-basis]   |
+| 混合版本 | flex     | none / [[pos-flex neg-flex] / preferred-size] |
+| 最老版本 | box-flex | number                                        |
+
+**Flex的一些简写**
+
+* `flex: 0 auto,flex: initial`与`flex: 0 1 auto`相同。（这也就是初始值。）根据width／height属性决定元素的尺寸。（如果项目的主轴长度属性的计算值为auto，则会根据其内容来决定元素尺寸。）当剩余空间为正值时，伸缩项目无法伸缩，但当空间不足时，伸缩项目可收缩至其最小值。网页作者可以用对齐相关的属性以及margin属性的auto值控制伸缩项目沿着主轴的对齐方式。
+
+* `flex: auto`与`flex: 1 1 auto`相同。根据width／height属性决定元素的尺寸，但是完全可以伸缩，会吸收主轴上剩下的空间。如果所有项目均为flex: auto、flex: initial或flex: none，则在项目尺寸决定后，剩余的正空间会被平分给是flex: auto的项目。
+
+* `flex: none`与`flex: 0 0 `auto相同。根据width／height属性决定元素的尺寸，但是完全不可伸缩。其效果与initial类似，但即使在空间不够而溢出的情况下，伸缩项目也不能收缩。
+
+* `flex: <positive-number>`与`flex: 1 0px`相同。该值使元素可伸缩，并将伸缩基准值设置为零，导致该项目会根据设置的比率占用伸缩容器的剩余空间。如果一个伸缩容器里的所有项目都使用此模式，则它们的尺寸会正比于指定的伸缩比率。默认状态下，伸缩项目不会收缩至比其最小内容尺寸（最长的英文词或是固定尺寸元素的长度）更小。网页作者可以靠设置min-width或min-height属性来改变这个默认状态。
+
+###**老版的box-flex**
+
+```css
+.aa{
+	display:box-flex
+	box-orient, box-direction, box-align, box-pack, box-lines
+	box-orient:horizontal | vertical | inline-axis | block-axis | inherit
+	box-direction:normal | reverse | inherit
+	box-align:start | end | center | baseline | stretch
+	box-pack:start | end | center | justify
+	box-lines:single | multiple
+}
+
+```
+`box-orient:horizontal | vertical | inline-axis | block-axis | inherit`
+inline-axis是默认值。且horizontal与inline-axis的表现似乎一致的，让子元素横排；而vertical与block-axis的表现也是一致的，让元素纵列
+
+`box-direction:normal | reverse | inherit`
+其中normal是默认值，表示按照正常顺序排列。所谓正常顺序，就是我们看书写文字的顺序，从左往右，由上至下，先出现的元素，就上面或是左边。而reverse表示反转
+
+`box-align:start | end | center | baseline | stretch`
+box-align与box-pack都是决定盒子内部剩余空间怎么使用的。在行为效果上就是表现为“对齐”.其中box-align决定了垂直方向上的空间利用，也就是垂直方向上的对齐表现。为了便于记忆，我们可以拿来和CSS2中的vertical-align隐射记忆，两者都有”align”，都是都是垂直方向的对齐；而剩下的box-pack就是水平方向的了
+
+`box-pack:start | end | center | justify`
+box-pack决定了父标签水平遗留空间的使用
+
+`box-lines:single | multiple`
+设置box-lines:multiple后，就多行显示了
+
+

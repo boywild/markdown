@@ -1,0 +1,47 @@
+##bower web包管理器
+
+##安装bower
+	npm install bower -g 
+
+##如何生成bower.json
+	bower init
+
+##用bower创建一个jquery和bootstrap的项目
+
+输入命令
+
+	bower install jquery
+	bower install bootstrap
+
+##如果用到的组件比较小众，在bower中没有注册怎么办？
+* 一、GitHub短写 
+例 安装`jquery`
+
+这是`jquery`在`GitHub`上的地址 `https://github.com/jquery/jquery`
+
+	bower install jquery/jquery
+
+* 二、或者用GitHub的完整链接
+
+这是`jquery`在`GitHub`上的地址 `https://github.com/jquery/jquery`
+
+	bower install https://github.com/jquery/jquery
+
+##如果使用的框架或者组件也没有在GitHub上出现，怎么办?
+
+`bower`也可以通过`url`进行安装
+例 jquery的一个在线地址是 `http://lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js`
+
+	bower install http://lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js
+
+##脚手架工具会生成的一些文件
+|     文件名     |                                                                说明                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| .travis.yml    | 为开源项目打造的持续集成环境                                                                                                       |
+| .jshintrc      | jshint的配置文件                                                                                                                   |
+| .editorconfig  | 有很多编辑器都支持.editorconfig这个文件，用来指定当前项目代码的风格，比如使用tab时是否自动替换成空格，代码缩进是2个字符还是4个字符 |
+| .gitignore     | 声明git版本管理忽略的文件                                                                                                          |
+| .gitattributes | git的配置项                                                                                                                        |
+| .bowerrc       | bower本身的配置项                                                                                                                  |
+| bower.json     | 用来配置bower需要从线上拉取哪些资源                                                                                                |
+

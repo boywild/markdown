@@ -1,0 +1,246 @@
+#seajs模块化jQuery与jQuery插件
+##模块化jQuery
+1、把`jQuery`修改成`SeaJs`的模块代码非常简单，就是用下面这段语句将`jQuery`源代码包裹起来：
+
+```js
+define('jquery',[],function(require, exports, module){
+	//这里放jQuery源代码
+	module.exports = jQuery;
+});
+```
+2、也可以加一个判断，如果`define`已经被定义，就把`jQuery`模块化，如果define没有被定义，正常执行`jQuery`代码：
+
+```js
+(function(factory) {
+	if (typeof define === 'function') {
+		define('/jquery', [], factory);
+	}
+	else {
+		factory();
+	}
+})(function(require) {
+	//这里放jQuery源代码
+	if (require) return $.noConflict(true);
+});
+```
+3、如果你用的是`jQuery1.7`版本以上的，那就更方便了。可以看下`jQuery`源码的最后几行，你会发现类似下方的代码：
+
+```js
+if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
+	define( "jquery", [], function () { return jQuery; } );
+}
+```
+4、如果判断语句为真，那么`jQuery`就会自动模块化。所以改下判断语句，只留`typeof define === "function"`，`jQuery`便可以自动模块化：
+
+```js
+if ( typeof define === "function") {
+	define( "jquery", [], function () { return jQuery; } );
+}
+```
+
+模块化后的调用代码如下：
+
+```js
+seajs.config({
+	'base':'/script',
+	'alias':{
+		'jquery':'jquery.sea.js'
+	}
+});
+
+seajs.use(['jquery'],function($){
+	console.log($);
+});
+
+```
+
+
+##模块化jQuery插件
+##1、普通插件
+
+```js
+(function($){
+	$.sayHello = function(){
+		console.log("Hello");
+	};
+})(jQuery)
+```
+一般模块化代码像下面这样：
+
+```js
+/*jquerySayHello.js*/
+(function (factory) {
+	if (typeof define === 'function') {
+		// 如果define已被定义，模块化代码
+		define('jquerySayHello',['jquery'], function(){
+			// 返回构造函数
+			return factory
+		});
+	} else {
+		// 如果define没有被定义，正常执行插件代码
+		factory(jQuery);
+	}
+}(function ($) {
+	// 这里才是插件真正的构造函数
+	console.log('init'); // 注意这行代码
+	$.sayHello = function(){
+		console.log("Hello");
+	};
+}));
+```
+使用插件的代码如下：
+
+```js
+seajs.config({
+	'base':'/script',
+	'alias':{
+		'jquery':'jquery.sea.js',
+		'jquerySayHello':'jquery.sayHello.sea.js'
+	}
+});
+
+seajs.use(['jquery','jquerySayHello'],function($,jquerySayHello){
+	jquerySayHello($); // 初始化插件
+	$.sayHello();
+});
+
+seajs.use(['jquery','jquerySayHello'],function($,jquerySayHello){
+	jquerySayHello($); // 初始化插件
+	$.sayHello();
+});
+```
+
+注意我在插件构造函数里面写的`console.log('init')`;这段代码，可以看到，如果我请求两次插件，插件就要初始化两次。这个虽然可以让代码只在使用时才执行，减少了资源消耗，但如果一个页面中多处需要这个插件的话，就要执行很多次。如果改成下面这种，直接在本模块里就执行：
+使用插件的代码如下：
+
+```js
+(function (factory) {
+	if (typeof define === 'function') {
+	// 如果define已被定义，模块化代码
+	define('jquerySayHello',['jquery'], function(require,exports,moudles){
+		factory(require('jquery')); // 初始化插件
+		return jQuery; // 返回jQuery
+	});
+} else {
+	// 如果define没有被定义，正常执行jQuery
+	factory(jQuery);
+}
+}(function ($) {
+	console.log('init');
+	$.sayHello = function(){
+		console.log("Hello");
+	};
+}));
+```
+
+使用插件的代码如下
+
+```js
+seajs.config({
+	'base':'/script',
+	'alias':{
+		'jquery':'jquery.sea.js',
+		'jquerySayHello':'jquery.sayHello.sea.js'
+	}
+});
+
+seajs.use(['jquery','jquerySayHello'],function($){
+	$.sayHello();
+});
+
+seajs.use(['jquery','jquerySayHello'],function($){
+	$.sayHello();
+});
+```
+
+
+##2、把jquery插件作为一个函数返回
+把`jquery`插件作为一个函数返回，带一个jquery参数，由调用者完成插件的初始化。以`jquery-themeswitch.js`插件为例子，该插件依赖jquery.cookie.js插件。
+
+```js
+/* jquery-themeswitch.js */
+define(function(require) { 
+
+  return function(jQuery) {
+
+      //先初始化依赖的模块
+      require('./jquery.cookie')(jQuery);   
+
+     //put plugin code here
+
+  }//end of function
+
+});
+```
+**jquery模块化后调用方式(下面的demo对模块的引用采用相对路径，实际的业务开发中可以通过seajs提供的alias来重命名)**
+(1)模块内部使用
+
+```js
+var $ = require('./libs/jquery');
+   require('./libs/jquery-themeswitch')($);
+   require('./libs/jquery-ui')($);         //demo涉及jquery ui组件
+   $(document).ready(function(){          //在DOM加载完成时运行代码
+       $('#elem').themeswitcher();
+   });
+
+```
+
+(2)在`script`代码片段中
+
+```js
+seajs.use(['./libs/jquery','./libs/jquery-themeswitcher', './lib/jquery-ui'],function ($, themeswitcher,jqueryui){
+        themeswitcher($);               //init jquery plugin     
+        jqueryui($);
+        $(function(){                   //dom ready调用的另外一种方式
+            $('#elem').themeswitcher()
+        });
+
+   });
+```
+
+**优缺点对比：**
+
+**优点：**
+1、依赖管理自动化 
+2、支持多个版本的`jQuery`使用。（需要这个优点吗？)
+
+**缺点：** 
+1、每次调用一次`require('plugin')($)`,会重新初始化一次插件 
+2、调用方式也不是很方便,调用代码不是很直观
+
+
+##3、让每个jquery插件模块返回$
+假定我们去掉`jquery`多版本的支持，让每个jquery插件模块返回`$`，看看代码调用方式是否会更自然一些。另外每个模块只能被编译一次，利用该特性，我们还可以做到让每个插件只会被初始化一次。
+还以`themeswitcher`为例子：
+
+```js
+/*jquery-theme-switcher.js*/
+define(function (require, exports, module) {
+    var jQuery  = require('./jquery');
+    require('./jquery-cookie');
+    //put plugin in code here
+    return jQuery;
+
+});
+```
+(1)模块内部使用
+
+```js
+require('./libs/jquery-ui');   //可以不处理返回值    
+   var $ = require('./libs/jquery-themeswitch')  //返回的还是$
+    $(function(){
+        $('#elem').themeswitcher();
+    });
+
+```
+
+(2)在script代码片段中
+
+```js
+seajs.use(['./libs/jquery-themeswitcher', './lib/jquery-ui'],function ($){
+        $(function(){
+            $('#elem').themeswitcher()
+        });
+   });
+
+```

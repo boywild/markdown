@@ -1,0 +1,99 @@
+##time-grunt
+**用途：**列出当前每个执行任务所需要的时间
+
+使用方法
+    require('time-grunt')(grunt)
+
+##load-grunt-tasks
+**用途：**加载当前项目需要的是所有依赖项，取代以前`grunt.loadNpmTask('grunt-contrib-watch')`这种繁琐的声明方式
+
+使用方法
+    require('load-grunt-tasks')(grunt)
+
+```js
+
+module.exports=function(grunt){
+	require('load-grunt-tasks')(grunt);
+	grunt.initConfig({
+        pkg:grunt.readJSON('package.json'),
+        connect:{
+        	options:{
+        		port:9000,
+        		open:true,
+        		livereload:35729,
+        		hostname:'localhost'
+        	},
+        	livereload:{
+        		options:{
+        			middleware:function(connect){
+        				return [
+        					connect.static('.tmp'),//将.tmp下的内容添加到根路径的路径匹配
+        					connect.use('/bower_compontents',connect.static('./bower_compontents')),//指定新的路径匹配
+        					connect.static('app')//将app下的内容添加到根路径的路径匹配
+        				]
+        			}
+        		}
+        	}
+        },
+        wiredep:{
+        	app:{
+        		ignorePath:/^\/|\.\.\//,
+        		src:['app/index.html'],
+        		exclude:['bower_compontents/bootstrap-sass-official/assets/bootstrap.js']
+        	},
+        	sass:{
+        		src:['app/styles/{,*/}*.{scss,saaa}'],
+        		ignorePath:/(\.\.\/){1,2}bower_compontents\//
+        	}
+        },
+        watch:{
+        	bower:{
+        		files:['bower.json'],
+        		tasks:['wiredep']
+        	},
+        	js:{
+        		files:['app/scripts/{,*/}*.js']
+        		tasks:['jshint'],
+        		options:{
+        			livereload:true
+        		}
+        	},
+        	gruntfile:{
+        		files:['Gruntfile.js']
+        	},
+        	sass:{
+        		files:['app/styles/{,*/}*.{scss,sass}'],
+        		tasks:['sass:server','autoprefixer']
+        	},
+        	styles:{
+        		files:['app/styles/{,*/}*.css'],
+        		tasks:['newer:copy:styles','autoprefixer']
+        	},
+        	livereload:{
+        		options:{
+        			livereload:'<%= connect.options.livereload %>'
+        		}
+        		files:[
+        			'app/{,*/}*.html',
+        			'.tmp/styles/{,*/}*.css',
+        			'app/images/{,*/}*'
+        		],
+        	}
+        }
+    });
+	require('time-grunt')(grunt);
+}
+
+```
+
+##常用插件
+grunt-contrib-copy
+grunt-contrib-clean
+grunt-contrib-watch
+grunt-contrib-sass
+grunt-contrib-connect //在本地启用 server
+
+grunt-spritesmith
+
+wiredep自动引用bower中下载的js和css文件到指定的html文件中
+concurrent:server//并行执行task

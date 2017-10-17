@@ -1,0 +1,137 @@
+###一个简单的jquery滚动条
+
+```css
+li{list-style:none;}
+ul{margin: 0;padding: 0;}
+.scroller{border: 1px solid #f00;overflow: hidden;margin: 0 auto;}
+.scroller.scrollStyle1{width: 400px;}
+.scroller.scrollStyle1 .scroll_box{height: 209px;}
+.scroll_box{float:left;width: 393px;overflow: hidden;position: relative;}
+.track{float:right;width: 5px;background: transparent;height: 209px;position: relative;background: #222;}
+.thumb{position: absolute;right: 0;top: 0;width: 5px;height: 100px;background: #7e7e7e;border-radius: 20px;}
+.scroll_absolute{position: absolute;top: 0;left: 0;right: 0;}
+.choose_pla ul{text-align: center;}
+.choose_pla ul li span{display:inline-block;*display:inline;*zoom:1;font-size: 16px;color: #1c1c1c;line-height: 30px;border: 2px solid transparent;cursor: pointer;transition: all 300ms ease-in 0s;padding: 0 15px;}
+.choose_pla ul li span:hover ,.choose_pla ul li span.on{border: 2px solid #278add;color: #278add;}
+```
+
+```html
+<div class="scroller clearfix scrollStyle1 cc">
+    <div class="track"><span class="thumb"></span></div>
+    <div class="scroll_box">
+        <div class="scroll_absolute">
+            <div class="choose_pla">
+                <ul>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>天津和平区教育资源公共服务平台</span></li>
+                    <li><span>济南教育资源公共服务平台</span></li>
+                    <li><span>莱芜教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>天津和平区教育资源公共服务平台</span></li>
+                    <li><span>济南教育资源公共服务平台</span></li>
+                    <li><span>莱芜教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>天津和平区教育资源公共服务平台</span></li>
+                    <li><span>济南教育资源公共服务平台</span></li>
+                    <li><span>莱芜教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>天津和平区教育资源公共服务平台</span></li>
+                    <li><span>济南教育资源公共服务平台</span></li>
+                    <li><span>莱芜教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                    <li><span>天津和平区教育资源公共服务平台</span></li>
+                    <li><span>济南教育资源公共服务平台</span></li>
+                    <li><span>莱芜教育资源公共服务平台</span></li>
+                    <li><span>宁波教育资源公共服务平台</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+```js
+$(function(){
+    $('.scroller').ScrollBar();
+});
+(function ($) {
+    $.fn.ScrollBar = function () {
+        return this.each(function () {
+            var _this = $(this),
+                box = $(this).find('.scroll_box'),
+                content = $(this).find('.scroll_absolute'),
+                track = $(this).find('.track'),
+                thumb = $(this).find('.thumb');
+            var H1 = box.outerHeight(true),
+                H2 = content.outerHeight(true),
+                radio = H2 / H1;//比例换算>0
+
+            if(radio<=1){//高度很小的时候隐藏滚动条
+                track.hide();
+            }else{
+                addEvent(_this[0], 'mousewheel', wheel);
+            }
+            //设置高度
+            track.height(H1);
+            thumb.height(H1 / radio);
+            var startY = thumb.offset().top;
+            var iScroll = 0,top = 0;
+            //添加事件
+            function addEvent(obj, type, fn) {
+                if (typeof obj.addEventListener != 'undefined') {
+                    obj.addEventListener('DOMMouseScroll', fn, false) || obj.addEventListener(type, fn, false);
+                } else if (typeof obj.attachEvent != 'undefined') {
+                    obj.attachEvent('on' + type, fn);
+                } else {
+                    obj['on' + type] = fn;
+                }
+            }
+
+            thumb.on('mousedown', move);
+            track.on('mouseup',drag);
+
+            function wheel(e) {
+                var e = e || window.event;
+                var iDetail = e.wheelDelta ? e.wheelDelta / 120 : -(e.detail % 3 == 0 ? e.detail / 3 : e.detail);
+                if (e && e.preventDefault) {//阻止默认事件
+                    e.preventDefault();
+                } else {
+                    window.event.returnValue = false;
+                    return false;
+                }
+                iScroll -= iDetail * 40;
+                iScroll = Math.min(H2 - H1, Math.max(0, iScroll));
+                thumb.css('top', iScroll / radio);
+                content.css('top', -iScroll);
+            }
+            function move(e) {
+                var e = event || window.event;
+                startY = event.pageY;
+                top = parseInt(thumb.css('top'));
+                $(document).on('mousemove', drag);
+                $(document).on('mouseup', end);
+                thumb.on('mouseup', end);
+                e.stopPropagation();
+            }
+            function drag(event) {
+                var e = event || window.event;
+                var dragY = e.pageY;
+                var now = Math.min(H1 - H1 / radio, Math.max(0, dragY - startY + top));
+                iScroll = now * radio;
+                thumb.css('top', now);
+                content.css('top', -iScroll);
+                window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
+                e.stopPropagation();
+            }
+            function end() {
+                $(document).off('mousemove', drag);
+                $(document).off('mouseup', end);
+            }
+        });
+    }
+})(jQuery);
+```

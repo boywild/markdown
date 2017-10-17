@@ -1,0 +1,420 @@
+###一、Range对象
+
+###属性
+
+| 属性值                        | 说明                                                                                                                                  |
+| -                             |                                                                                                                                       |
+| Range.collapsed               | 用于判断Range对象所代表的区域的开始点与结束点是否处于相同的位置，如果相同该属性值返回true                                             |
+| Range.commonAncestorContainer | 用于返回Range对象所代表的区域位于什么节点之中，该属性值为包含了该区域的最低层节点(一个节点可能是一个元素，也可能是一段完整文字)的节点 |
+| Range.endContainer            | 用于返回Range对象所代表的区域的终点位于什么节点之中，该属性值为包含了该区域终点的最底层节点                                           |
+| Range.endOffset               | 用于返回Range对象所代表的区域的终点与包含该终点的节点的起点之间的距离                                                                 |
+| Range.startContainer          | 用于返回Range对象所代表的区域的起点位于什么节点之中，该属性值为包含了该区域起点的最底层节点                                           |
+| Range.startOffset             | 用于返回Range对象所代表的区域的起点与包含该起点的节点的起点之间的距离                                                                 |
+|                               |                                                                                                                                       |
+
+###方法
+
+####1、定位方法
+| 方法                       | 说明                                                                                                                                              |
+| -                          |                                                                                                                                                   |
+| Range.setStart()           | 用于将某个节点中的某处位置指定为Range对象所代表区域的起点位置                                                                                     |
+| Range.setEnd()             | 用于将某个节点中的某处位置指定Range对象所代表区域的结束位置                                                                                       |
+| Range.setStartBefore()     | 用于将某个节点的起点位置指定为Range对象所代表区域的起点位置                                                                                       |
+| Range.setStartAfter()      | 用于将某个节点的终点位置指定为Range对象所代表区域的起点位置                                                                                       |
+| Range.setEndBefore()       | 用于将某个节点的起点位置指定为Range对象所代表区域的终点位置                                                                                       |
+| Range.setEndAfter()        | 用于将某个节点的终点位置指定为Range对象所代表区域的终点位置                                                                                       |
+| Range.selectNode()         | 用于将Range对象的起点指定为某个节点的起点，将Range对象的终点指定为该节点的终点，使Range对象所代表的区域中包含该节点Range                         |
+| Range.selectNodeContents() | 用于将Range对象的起点指定为某个节点中的所有内容的起点，将Range对象的终点指定为该节点所有内容的终点，使Range对象所代表的区域中包含该节点的所有内容 |
+| Range.collapse()           | 向指定端点折叠该Range                                                                                                                            |
+
+
+####2、编辑方法
+| 方法                     | 说明                                                                                                |
+| -                        |                                                                                                     |
+| Range.cloneContents()    | 用于在页面上追加一段HTML代码，并且将Range对象所代表区域中的HTML代码克隆到被追加的html代码中         |
+| Range.deleteContents()   | 用于将Range对象中所包含的内容从页面中删除                                                           |
+| Range.extractContents()  | 用于将Range对象所代表区域中的html代码克隆到一个DocumentFragment对象中，然后从页面中删除这段HTML代码 |
+| Range.insertNode()       | 用于将指定的节点插入到某个Range对象所代表的区域中，插入位置为Range对象所代表区域的起点位置          |
+| Range.surroundContents() | 将 Range 的内容移动到一个新的节点中                                                                 |
+
+
+####3、其他方法
+| 方法                          | 说明                                           |
+| -                             |                                                |
+| Range.compareBoundaryPoints() | 比较两个 Range 的端点。                        |
+| Range.cloneRange()            | 返回拥有和原 Range 相同端点的克隆 Range 对象。 |
+| Range.detach()                | 从使用状态释放 Range，此方法用于改善性能       |
+| Range.toString()              | 把Range内容作为字符串返回                      |
+
+####4、Gecko方法
+**在这里解释Mozilla独有的，在W3C DOM标准里没有的 Range方法**
+
+| 方法                             | 说明                                                 |
+| -                                |                                                      |
+| Range.compareNode()              | 返回常量，表示node是否在range的前、后、中、外        |
+| Range.comparePoint()             | 返回-1、0、1，分别表示指定点在range的前、中、后      |
+| Range.createContextualFragment() | 解析指定字符串（XML或HTML），并返回document fragment |
+| Range.intersectsNode()           | 返回boolean值，表示指定Node是否横断Range             |
+| Range.isPointInRange()           | 返回boolean值，表示指定点是否在range中               |
+
+
+`document.selection`和`document.getSelection()/window.getSelection()`分别为`IE` 和`w3c`浏览器 创建`selection`对象
+`document.createTextRange()`和`document.createRange()`分别为IE和`w3c`浏览器创建`range`对象
+`document.selection.createRange()`和`window.getSelection().getRangeAt(0)`是从`selection`对象获得`range`对象
+
+标准`dom`是从`window`中获取`selection`对象，而`ie`是从`document`对象中获取。 
+标准`dom range`对象(以下称`dom rang`)和`ie`的`TextRange`对象(以下称`TextRange`),在操作模式上有很大区别，可以说`domrange`是基于`dom`结构控制的，`TextRange`是基于文本节点字节控制的
+
+
+###二、Range对象的概念
+ Range对象代表页面上的一段连续区域，通过Range对象，可以获取或修改页面上的任何区域，可以通过如下创建一个空的Range对象，如下：
+`var  range = document.createRange()`
+
+在html5中，每一个浏览器窗口及每一个窗口中都有一个selection对象，代表用户鼠标在页面中所选取的区域，(注意：经过测试IE9以下的浏览器不支持Selection对象), 可以通过如下语句创建selection对象
+
+```js
+   var  selection = document.getSelection();
+   var  selection  = window.getSelection();
+```
+每一个 `selection`对象都有一个或者多个`Range`对象，每一个`range`对象代表用户鼠标所选取范围内的一段连续区域，在`firefox`中，可以通过 ctrl键可以选取多个连续的区域，因此在`firefox`中一个`selection`对象有多个`range`对象，在其他浏览器中，用户只能选取一段连续的区 域，因此只有一个`range`对象。
+可以通过`selection`对象的`getRangeAt`方法来获取`selection`对象的某个`Range`对象，如下：
+`var range = document.getSelection().getRangeAt(index)`
+
+```js
+function getRange(selection) {
+    if (selection.getRangeAt) {
+        return selection.getRangeAt(0);
+    } else { //不支持getRangeAt的情况
+        var range = document.createRange();
+        range.setStart(selection.anchorNode, selection.anchorOffset);
+        range.setEnd(selection.focusNode, selection.focusOffset);
+        return range;
+    }
+}
+```
+
+####getRangeAt()
+方法有一个参数index，代表该Range对象的序列号；我们可以通过Selection对象的rangeCount参数的值判断用户是否选取了内容；
+
+```html
+<h3>selection对象与range对象的使用实例</h3>
+ <input type="button" value="点击我" onclick="rangeTest()"/>
+ <div id="showRange"></div>
+```
+
+```js
+function rangeTest() {
+    var  html,
+    showRangeDiv = document.getElementById("showRange"),
+     selection = document.getSelection();
+    if(selection.rangeCount > 0) {
+        html = "你选取了" + selection.rangeCount + "段内容<br/>";
+        for(var i = 0; i < selection.rangeCount; i++) {
+            var range = selection.getRangeAt(i);
+            html += "第" + (i + 1) + "段内容为：" + range + "<br/>";
+        }
+        showRangeDiv.innerHTML = html;
+    }
+}
+```
+
+**注**上面的rangeObj代表一个Range对象，该方法使用一个参数，代表页面中的一个节点。
+
+####selectNode()
+Range对象的selectNode方法用于将Range对象的起点指定为某个节点的起点，将Range对象的终点指定为该节点的终点，使Range对象所代表的区域中包含该节点
+`rangeObj.selectNode(node);`
+
+####selectNodeContents()
+用于将Range对象的起点指定为某个节点中的所有内容的起点，将Range对象的终点指定为该节点所有内容的终点，使Range对象所代表的区域中包含该节点的所有内容
+`rangeObj.selectNodeContents(node)`
+
+####deleteContents()
+用于将Range对象中所包含的内容从页面中删除
+`rangeObj.deleteContents()`
+
+
+```html
+<div id="div" style="background-color:#e0a0b0;width:300px;height:50px;">元素中的内容</div>
+<button onclick="deleteRangeContents(true)">删除内容</button>
+<button onclick="deleteRangeContents(false)">删除元素</button>
+```
+
+```js
+function deleteRangeContents(flag) {
+    var div = document.getElementById("div");
+    var rangeObj = document.createRange();
+    if(flag) {
+        // selectNodeContents指选中Range对象中的所有内容  进行删除掉
+        rangeObj.selectNodeContents(div);
+        rangeObj.deleteContents();
+    }else {
+        rangeObj.selectNode(div);
+        rangeObj.deleteContents();
+    }
+}
+```
+
+####setStart()
+用于将某个节点中的某处位置指定为Range对象所代表区域的起点位置
+`rangeObj.setStart(node,curIndex)`
+该setStart方法使用2个参数，第一个参数node代表一个节点，第二个参数是一个数字，当第一个参数 node所代表的节点是一个内容为一段文字的文字节点时，该参数值用于指定将第几个文字的结束位置作为Range对象所代表的区域的起点位置；当第一个参 数node所代表的节点中包括其他子节点时，该参数值用于将第几个子节点的结束位置指定为Range对象所代表的区域的起点位置；
+
+####setEnd()
+用于将某个节点中的某处位置指定Range对象所代表区域的结束位置
+`rangeObj.setEnd(node,curIndex)`
+
+该方法中的2个参数的含义如setStart方法中参数的含义相同；只不过一个是起点位置，另一个是结束位置；
+
+```html
+<div id="myDiv">这段文字中第三个文字到第十个文字将被删除掉</div>
+ <button onclick="DeleteChar()">删除文字</button>
+```
+
+```js
+    function DeleteChar(){
+        var myDiv = document.getElementById("myDiv");
+        var textNode = myDiv.firstChild;
+        var rangeObj = document.createRange();
+        rangeObj.setStart(textNode,2);
+        rangeObj.setEnd(textNode,10);
+        rangeObj.deleteContents();
+    }
+```
+
+####setStartBefore()
+用于将某个节点的起点位置指定为Range对象所代表区域的起点位置
+`rangeObj.setStartBefore(node)`
+####setStartAfter()
+用于将某个节点的终点位置指定为Range对象所代表区域的起点位置
+`rangeObj.setStartAfter(node)`
+####setEndBefore()
+用于将某个节点的起点位置指定为Range对象所代表区域的终点位置
+`rangeObj.setEndBefore(node)`
+####setEndAfter() 
+用于将某个节点的终点位置指定为Range对象所代表区域的终点位置
+`rangeObj.setEndAfter(node)`
+
+我们还是先来做一个demo，来理解下上面的四个方法；如下所示：
+
+```html
+<table id="myTable" border = "1" cellspacing="0" cellpadding="0">
+     <tr>
+         <td>第一行第一列</td>
+         <td>第一行第二列</td>
+     </tr>
+     <tr>
+         <td>第二行第一列</td>
+         <td>第二行第二列</td>
+     </tr>
+ </table>
+ <button onclick="deleteFirstRow()">删除第一行</button>
+```
+```js
+function deleteFirstRow(){
+    var myTable = document.getElementById("myTable");
+    if(myTable.rows.length > 0){
+        var row = myTable.rows[0];
+        var rangeObj = document.createRange();
+        rangeObj.setStartBefore(row);
+        rangeObj.setEndAfter(row);
+        rangeObj.deleteContents();
+    }
+}
+```
+
+####cloneRange()
+Range对象的cloneRange方法用于对当前的Range对象进行复制，该方法返回复制的Range对象
+`var rangeClone = rangeObj.cloneRange()`
+
+```html
+<div id="test">aaaa</div>
+<button onclick="cloneARange()">克隆Range对象</button> 
+```
+
+```js
+function cloneARange() {
+    var testObj = document.getElementById("test");
+    var rangeObj = document.createRange();
+    rangeObj.selectNodeContents(testObj);
+    var rangeClone = rangeObj.cloneRange();
+    alert(rangeClone);
+}
+```
+
+####cloneContents()
+该方法用于在页面上追加一段HTML代码，并且将Range对象所代表区域中的HTML代码克隆到被追加的html代码中
+`var  html = rangeObj.cloneContents()`
+
+该方法不使用任何参数，该方法返回一个DocumentFragment对象，该对象为一个容器元素，当需要追加，删除，修改或查找页面上的元素，该对象变得非常有用；
+
+```html
+<div id="div">实例文字<br/>
+    <button onclick="cloneDivContent()">克隆</button>
+</div>
+```
+```js
+function cloneDivContent() {
+    var div = document.getElementById("div");
+    var rangeObj = document.createRange();
+    rangeObj.selectNodeContents(div);
+    var documentFragment = rangeObj.cloneContents();
+    div.appendChild(documentFragment);
+}
+```
+
+####extractContents()
+用于将Range对象所代表区域中的html代码克隆到一个DocumentFragment对象中，然后从页面中删除这段HTML代码
+`var  documentFragment = rangeObj.extractContents()`
+
+该方法返回一个包含了Range对象所代表区域中的HTML代码的DocumentFragment对象
+
+```html
+<div id="srcDiv" style="width:300px;height:50px;background-color:red;">demo</div>
+<div id="destDiv" style="width:300px;height:50px;background:blue;">demo2</div>
+<button onclick = "moveContent()">移动元素内容</button>
+```
+
+```js
+function moveContent() {
+    var srcDiv = document.getElementById("srcDiv");
+    var destDiv = document.getElementById("destDiv");
+    var rangeObj = document.createRange();
+    rangeObj.selectNodeContents(srcDiv);
+    var documentFragment = rangeObj.extractContents();
+    destDiv.appendChild(documentFragment);
+}
+```
+####insertNode()
+该方法用于将指定的节点插入到某个Range对象所代表的区域中，插入位置为Range对象所代表区域的起点位置，如果该节点已经存在于页面中，该节点将被移动到Range对象代表的区域的起点处。
+`rangeObj.insertNode(node)`
+
+```html
+<div onmouseup="MoveButton()" style="width:400px;height:100px;background-color:red">aaaaaaaaabbbbbb</div>
+<button id="button">按钮</button>
+```
+```js
+function MoveButton() {
+    var button = document.getElementById("button");
+    var selection = document.getSelection();
+    if(selection.rangeCount > 0) {
+        var range = selection.getRangeAt(0);
+        range.insertNode(button);
+    }
+}
+```
+
+
+
+###三、TextRange对象
+`TextRange`对象主要使用以下方法控制区域的选择
+1、moveStart
+2、moveEnd
+3、move 
+这三个函数使用相同的参数语法:`fn(sUnit [, iCount])`
+第一个参数是指移动的单位，可以使用的参数：`character`（字符）、`word`（词）、`sentence`（段落）、`textedit`（整个编辑区） 
+第二个参数指移动的数量单位，负数向所在位置之前移动，正数向所在位置之后移动。 
+在实际开发中一般使用`character`，其他几个参数在中文环境和html编辑时，和预想位置有偏差。 
+
+####例1：TextRange选择光标前4个字符 
+
+```js
+var rg=document.selection.createRange(); 
+rg.moveStart("character",-4); 
+rg.select();//显式选择文本区域，不调用此函数也可以获得选择的内容 
+var text=rg.text;//获得选择的文本 
+var htmlText=rg.htmlText;//获得选择文本的html代码 
+```
+
+**注：**用rg.htmlText获得选择文本的html代码，但获得结果不尽人意， 
+如:`<b>aaaa</b>bb` ,当选择`aabb`段时，`.htmlTex`返回的是`<b>aa</b>bb`而不是`aa</b>bb `
+
+`dom` `range`对象选择区域主要以`dom`节点为为坐标，所有边界移动和区域选择函数都是以dom节点为参照的`.setEnd()setStart()`是控制范围的前边界点和后边界点位置的函数，有两个参数，第一个参数是`dom`节点，第二个参数是偏移量，这个参数和`TextRange.move`中不同，是相对于`dom`节点的偏移量。 
+
+如：有文字节点node1 nodeValue是aaabbbccc,setStart(node1,3)则设置开始位置在字符a、b之间。那如何像例1一样选择光标前4个字符呢，这需要了解dom range对象的几个属性：
+
+* endContainer 包含范围的结束点的 dom节点。 
+* endOffset endContainer 中的结束点位置。 
+* startContainer 包含范围的开始点的 dom节点。 
+* startOffset startContainer 中的开始点位置。 
+
+####例2：dom range选择光标前4个字符 
+
+```js 
+var rg=window.getSelection().getRangeAt(0); 
+rg.setStart(rg.startContainer,rg.startOffset-4);//获得当前range strat所在节点和偏移量，计算后作为参数 
+//在调用setStart后即显式选择，与TextRange不同 
+var text=rg.toString();//获得选择文本 
+rg.collapse(false);//collapse函数与TextRange.collapse相同 
+```
+
+
+```html
+<div id="ifram_div"></div>
+```
+```js
+window.onload=function(){
+    var iframeContent="";
+    var divContent="";
+    var divChange=false;
+    var iframeChange=false;
+    var $=function(s){return document.getElementById(s);}
+    $("ifram_div").innerHTML+='<div id="infoIframe">iframe</div><iframe id="youretextarea" style="height:200px;width:99%;" class="_editbox"></iframe>';
+    var fw=$("youretextarea").contentWindow;
+    var f=fw.document;
+    f.designMode = 'On';
+    f.contentEditable = true;
+    f.open();
+    f.writeln('<html><style>p{margin:0px;padding:0px;}body{margin:0px;padding:0px;font:16/18px Arial;}</style><body><b>aaaa</b><u>bbbb</u>cccddd</body></html>');
+    f.close();
+    if(f.attachEvent){
+        f.attachEvent("onkeyup",fun1);
+    }else{
+        fw.addEventListener("keyup",fun1,true);
+    }
+    function fun1(){
+        if(f.selection){
+            var rg=f.selection.createRange();
+            rg.moveStart("character",-4);
+//rg.select();//显式选择文本区域，不调用此函数也可以获得选择的内容
+            var text=rg.text;//获得选择的文本
+            var htmlText=rg.htmlText;//获得选择文本的html代码
+            alert(text);
+        }else{
+            var rg=fw.getSelection().getRangeAt(0);
+            rg.setStart(rg.startContainer,rg.startOffset-4);//获得当前range strat所在节点和偏移量，计算后作为参数
+//在调用setStart后即显式选择，与TextRange不同
+            var text=rg.toString();//获得选择文本
+            rg.collapse(false);//collapse函数与TextRange.collapse相同
+            alert(text);
+        }
+    }
+}
+```
+####例3:获得用户所选内容
+
+```js
+var userSelection;
+if (window.getSelection) { //现代浏览器
+    userSelection = window.getSelection();
+} else if (document.selection) { //IE浏览器 考虑到Opera，应该放在后面
+    userSelection = document.selection.createRange();
+}
+alert(userSelection)
+var selectedText = userSelection;
+if (userSelection.text) {
+    selectedText = userSelection.text;
+}
+```
+
+###四、兼容
+
+| Range                   | TextRange           |
+| -                       |                     |
+| cloneRange()            | duplicate()         |
+| setStart()              | moveStart()         |
+| setEnd()                | moveEnd()           |
+| selectNodeContents()    | moveToElementText() |
+| toString()              | text                |
+| compareBoundaryPoints() | compareEndPoints()  |
+
+

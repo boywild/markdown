@@ -1,0 +1,106 @@
+#ES6语法实现模板编译
+#基础字符串模板
+
+```js
+var template = `
+<ul>
+  <% for(var i=0; i < data.supplies.length; i++) { %>
+    <li><%= data.supplies[i] %></li>
+  <% } %>
+</ul>
+`;
+```
+
+思路：怎么编译这个模板字符串呢？根本原理可以用ES5语法的循环拼接字符串，这里设置这个循环拼接函数为echo()
+将其转换为JavaScript表达式字符串
+
+```js
+echo('<ul>');
+for(var i=0; i < data.supplies.length; i++) {
+  echo('<li>');
+  echo(data.supplies[i]);
+  echo('</li>');
+};
+echo('</ul>');
+```
+
+用正则来匹配将基础字符串模板替换为想要的字符串模板
+
+```js
+var evalExpr = /<%=(.+?)%>/g;
+var expr = /<%([\s\S]+?)%>/g;
+
+template = template
+  .replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
+  .replace(expr, '`); \n $1 \n  echo(`');
+
+template = 'echo(`' + template + '`);';
+```
+
+然后，将template封装在一个函数里面返回，就可以了。
+
+```js
+var script =
+`(function parse(data){
+  var output = "";
+
+  function echo(html){
+    output += html;
+  }
+
+  ${ template }
+
+  return output;
+})`;
+
+return script;
+```
+
+注意：这里用到了ES6语法的字符串模板属性${ template }，在模板中可以运行函数和使用变量
+最后，将上面的内容拼装成一个模板编译函数compile。
+
+```js
+var template = `
+<ul>
+  <% for(var i=0; i < data.supplies.length; i++) { %>
+    <li><%= data.supplies[i] %></li>
+  <% } %>
+</ul>
+`;
+function compile(template){
+  var evalExpr = /<%=(.+?)%>/g;
+  var expr = /<%([\s\S]+?)%>/g;
+
+  template = template
+    .replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
+    .replace(expr, '`); \n $1 \n  echo(`');
+
+  template = 'echo(`' + template + '`);';
+
+  var script =
+  `(function parse(data){
+    var output = "";
+
+    function echo(html){
+      output += html;
+    }
+
+    ${ template }
+
+    return output;
+  })`;
+
+  return script;
+}
+var parse = eval(compile(template));
+div.innerHTML = parse({ supplies: [ "broom", "mop", "cleaner" ] });
+```
+编译后输出
+
+```html
+<ul>
+    <li>broom</li>
+    <li>mop</li>
+    <li>cleaner</li>
+</ul>
+```

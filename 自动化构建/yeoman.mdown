@@ -1,0 +1,37 @@
+##yeoman是个脚手架(生成器) 在web项目开始时使用yeoman来生成项目文件，代码结构。yeoman自动将最佳实践和工具整合进来，大大加速和方便我们的开发
+##安装
+
+    npm install yo -g 
+
+`yeoman`需要和`generators`搭配使用，`yeoman`和`generators`的关系就像橡皮泥和橡皮泥捏出来的模具
+**yeoman基于node**
+
+##用yeoman搭建一个angular项目
+* 一、开始
+learnangular是angular项目脚手架初始化的项目名
+
+运行命令
+
+    yo angular learnangular
+
+##脚手架工具会生成的一些文件
+|     文件名     |                                                                说明                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| .travis.yml    | 为开源项目打造的持续集成环境                                                                                                       |
+| .jshintrc      | jshint的配置文件                                                                                                                   |
+| .editorconfig  | 有很多编辑器都支持.editorconfig这个文件，用来指定当前项目代码的风格，比如使用tab时是否自动替换成空格，代码缩进是2个字符还是4个字符 |
+| .gitignore     | 声明git版本管理忽略的文件                                                                                                          |
+| .gitattributes | git的配置项                                                                                                                        |
+| .bowerrc       | bower本身的配置项                                                                                                                  |
+| bower.json     | 用来配置bower需要从线上拉取哪些资源                                                                                                |
+
+
+
+  
+    
+   
+  
+ 
+  
+
+

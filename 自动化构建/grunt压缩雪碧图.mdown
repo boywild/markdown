@@ -1,0 +1,56 @@
+##grunt 打包雪碧图
+* 插件`grunt-spritesmith`
+
+简易配置
+
+```js
+    // 项目配置(任务配置)
+    grunt.initConfig({
+        // 读取我们的项目配置并存储到pkg属性中
+        pkg: grunt.file.readJSON('package.json'),
+        // 自动雪碧图
+        sprite: {
+            all: {
+                src: 'src/slice/*.png',
+                dest: 'src/css/spritesheet.png',
+                destCss: 'src/css/sprites.css'
+            }
+        }
+    }); // grunt.initConfig配置完毕
+
+    // 加载插件
+    grunt.loadNpmTasks('grunt-spritesmith');
+
+    // 自定义任务
+    grunt.registerTask('default', ['sprite']);
+```
+
+配置项
+* **src** `String|String[]` - 在spritesheet中用作精灵的图像
+    * 例如，这可以是一个glob sprites/*.png或一个文件数组['sprite1.png', sprite2.png']
+* **dest** `String` - 生成的spritesheet的输出位置
+    * 例如 path/to/output/spritesheet.png
+* **destCss** `String` - 生成的CSS的输出位置
+    * 例如 path/to/output/sprites.css
+* **imgPath** `String` - CSS中指定的spritesheet路径的可选覆盖
+    * 例如，如果../sprite.png给出，则CSS将具有：`background-image: url(../sprite.png);`
+* **padding** `Number` - 填充到精灵之间的右侧和底部
+    * 默认情况下没有填充
+
+##一下是一些高级用法，如需了解，移步官网 https://github.com/Ensighten/grunt-spritesmith
+* **algorithm** `String` - 用于在spritesheet中定位精灵的算法
+    * 默认情况下，这是binary-tree最好的包装
+* **algorithmOpts** `Mixed` - 传递给算法的选项
+    * 我们可以通过一些算法跳过排序 {algorithmOpts: {sort: false}}
+* **engine** `String` - 引擎
+    * 默认情况下，这是pixelsmith一个node基于引擎
+* **engineOpts** `Object` - 通过引擎进行设置的选项
+    * 例如phantomjssmith接受timeout通过{engineOpts: {timeout: 10000}}
+* **imgOpts** `Object` - 通过出口引擎的选项
+    * 例如通过gmsmith支持quality{imgOpts: {quality: 75}}
+* **cssFormat** `String` - CSS格式使用
+* **cssTemplate** `String|Function` - 用于渲染输出CSS的CSS模板
+* **cssHandlebarsHelpers** `Object` - 帮助者注册到我们模板的 句柄的容器
+* **cssVarMap** `Function` - 将每个文件名映射到CSS变量的函数
+* **cssSpritesheetName** `String` - 在预处理器模板中用于spritesheet相关变量的名称
+* **cssOpts** `Object` - 通过模板的选项

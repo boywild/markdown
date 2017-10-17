@@ -1,0 +1,46 @@
+#visualviewport
+可以认为是设备自己的宽度，也叫视口尺寸指的是浏览器可视区域的宽度。
+
+#layout viewport
+可以认为是虚拟的窗口，也可以片面的理解为苹果或者安卓手机屏幕的分辨率(注：是分辨率而非手机屏幕大小)
+
+#ideal viewport
+移动设备的理想viewport
+
+当你打开一个960px设计的网页时，手机会根据css中的百分比进行缩放。比如总长960的页面，导航条是20%。（实际解析出来就是192px）但是你不可能每个属性都是百分比吧，比如文字大小。那么我用320px屏幕打开，导航条就成了64px了，但是我的字体大小是12px啊，完了，本来能显示很多汉字的（192/12）现在只能显示64/12个汉字了。
+
+Apple找到了一个办法：在移动版(iOS)的Safari中定义了viewportmeta标签①，它的作用就是创建一个虚拟的窗口(viewport)，而且这个虚拟窗口的分辨率接近于桌面显示器，Apple将其定位为980px②
+以一代iphone下的Safari来说就是：在iphone的320px物理屏幕上——视觉窗口(visual viewport)，创建出了一个980px的虚拟窗口——布局窗口(layout viewport)，在视觉窗口(visual viewport)中我们可以拖动横向竖向滑动条或者放大缩小网页来达到最佳的浏览效果(类似桌面浏览器)；而布局窗口(layout viewport)用来配合CSS渲染布局
+
+#物理像素(physical pixel)
+一个物理像素是显示器(手机屏幕)上最小的物理显示单元，在操作系统的调度下，每一个设备像素都有自己的颜色值和亮度值。
+
+#设备独立像素(density-independent pixel)
+设备独立像素(也叫密度无关像素)，可以认为是计算机坐标系统中得一个点，这个点代表一个可以由程序使用的虚拟像素(比如: css像素)，然后由相关系统转换为物理像素。
+
+#高像素密度屏幕（高 ppi）
+window.devicePixelRatio(device pixel ratio dip或dpI或dpr)是设备上物理像素和设备独立像素(device-independent pixels (dips))的比例
+公式表示就是：
+
+    window.devicePixelRatio = 物理像素 / dips
+
+
+dip或dpI(指每英寸点的个数),（device independent pixels，设备独立像素）与屏幕密度有关。dip可以用来辅助区分视网膜设备还是非视网膜设备
+列 所有非视网膜屏幕的iphone在垂直的时候，宽度为320物理(物理即看不见摸不着)像素 这里的320就是设备物理像素也就是设备屏幕的分辨率，分辨率和屏幕尺寸不是同一个概念
+设备独立像素也就是设备屏幕实物的尺寸
+
+    本文的DIPs切勿和DPI搞混了！DPI指每英寸点的个数，本文的DIPs指设备独立像素。
+
+#概念理解
+移动设备上的浏览器认为自己必须能让所有的网站都正常显示，即使是那些不是为移动设备设计的网站。但如果以浏览器的可视区域作为viewport的话，因为移动设备的屏幕都不是很宽，所以那些为桌面浏览器设计的网站放到移动设备上显示时，必然会因为移动设备的viewport太窄，而挤作一团，甚至布局什么的都会乱掉。也许有人会问，现在不是有很多手机分辨率都非常大吗，比如768x1024，或者1080x1920这样，那这样的手机用来显示为桌面浏览器设计的网站是没问题的吧？前面我们已经说了，css中的1px并不是代表屏幕上的1px，你分辨率越大，css中1px代表的物理像素就会越多，devicePixelRatio的值也越大，这很好理解，因为你分辨率增大了，但屏幕尺寸并没有变大多少，必须让css中的1px代表更多的物理像素，才能让1px的东西在屏幕上的大小与那些低分辨率的设备差不多，不然就会因为太小而看不清。所以在1080x1920这样的设备上，在默认情况下，也许你只要把一个div的宽度设为300多px（视devicePixelRatio的值而定），就是满屏的宽度了。回到正题上来，如果把移动设备上浏览器的可视区域设为viewport的话，某些网站就会因为viewport太窄而显示错乱，所以这些浏览器就决定默认情况下把viewport设为一个较宽的值，比如980px，这样的话即使是那些为桌面设计的网站也能在移动浏览器上正常显示了。
+
+ppk把这个浏览器默认的viewport叫做 **layout viewport**。这个layout viewport的宽度可以通过 document.documentElement.clientWidth 来获取。
+
+layout viewport的宽度是大于浏览器可视区域的宽度的，所以我们还需要一个viewport来代表 浏览器可视区域的大小，ppk把这个viewport叫做 **visual viewport**。
+visual viewport的宽度可以通过window.innerWidth 来获取，但在Android 2, Oprea mini 和 UC 8中无法正确获取现在我们已经有两个viewport了：layout viewport 和 visual viewport。但浏览器觉得还不够，因为现在越来越多的网站都会为移动设备进行单独的设计，所以必须还要有一个能完美适配移动设备的viewport。所谓的完美适配指的是，首先不需要用户缩放和横向滚动条就能正常的查看网站的所有内容；第二，显示的文字的大小是合适，比如一段14px大小的文字，不会因为在一个高密度像素的屏幕里显示得太小而无法看清，理想的情况是这段14px的文字无论是在何种密度屏幕，何种分辨率下，显示出来的大小都是差不多的。当然，不只是文字，其他元素像图片什么的也是这个道理。ppk把这个viewport叫做 **ideal viewport**，也就是第三个viewport——移动设备的理想viewport。
+ideal viewport并没有一个固定的尺寸，不同的设备拥有有不同的ideal viewport。所有的iphone的ideal viewport宽度都是320px，无论它的屏幕宽度是320还是640，也就是说，在iphone中，css中的320px就代表iphone屏幕的宽度
+再总结一下：ppk把移动设备上的viewport分为layout viewport  、 visual viewport   和 ideal viewport  三类，其中的ideal viewport是最适合移动设备的viewport，ideal viewport的宽度等于移动设备的屏幕宽度，只要在css中把某一元素的宽度设为ideal viewport的宽度(单位用px)，那么这个元素的宽度就是设备屏幕的宽度了，也就是宽度为100%的效果。ideal viewport 的意义在于，无论在何种分辨率的屏幕下，那些针对ideal viewport 而设计的网站，不需要用户手动缩放，也不需要出现横向滚动条，都可以完美的呈现给用户
+
+    visual viewport宽度 = ideal viewport宽度  / 当前缩放值
+    当前缩放值 = ideal viewport宽度  / visual viewport宽度
+

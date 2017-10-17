@@ -1,0 +1,222 @@
+[TOC]
+##常用npm命令列表
+
+| 命令          | 解释                                 |
+| -             |                                      |
+| npm init      | 在项目中引导创建一个package.json文件 |
+| npm install   | 安装模块                             |
+| npm uninstall | 卸载模块                             |
+| npm update    | 更新模块                             |
+| npm outdated  | 检查模块是否已经过时                 | 
+| npm remove    | 移除                                 |
+| npm root      | 查看当前包的安装路径                 |
+| npm root -g   | 查看全局模块的安装目录               |
+| npm help      | 查看npm帮助                          |
+| npm list      | 当前目录已安装插件                   |
+| npm config    | 管理npm的配置路径                    |
+| npm cache     | 管理模块的缓存                       |
+| npm start     | 启动模块                             |
+| npm stop      | 停止模块                             |
+| npm restart   | 重新启动模块                         |
+| npm test      | 测试模块                             |
+| npm version   | 查看模块版本                         |
+| npm view      | 查看模块的注册信息                   |
+| npm publish   | 发布模块                             |
+| npm access    | 在发布的包上设置访问级别             |
+
+###`npm init`
+安装包的信息可保持到项目的package.json文件中，以便后续的其它的项目开发或者他人合作使用，也说package.json在项目中是必不可少的。
+
+	npm init [-f|--force|-y|--yes]
+
+###`npm install`
+	npm install (with no args, in package dir)
+	npm install [<@scope>/]<name>
+	npm install [<@scope>/]<name>@<tag>
+	npm install [<@scope>/]<name>@<version>
+	npm install [<@scope>/]<name>@<version range>
+	npm install <tarball file>
+	npm install <tarball url>
+	npm install <folder>
+	alias: npm i
+	common options: [-S|--save|-D|--save-dev|-O|--save-optional] [-E|--save-exact] [--dry-run]
+
+	npm install gulp
+
+安装指定版本
+
+	npm install gulp@3.9.1
+
+* -**S, --save** 安装包信息将加入到dependencies（生产阶段的依赖）
+
+	npm install gulp --save 或 npm install gulp -S
+
+
+package.json 文件的 dependencies 字段：
+
+	"dependencies": {
+	    "gulp": "^3.9.1"
+	}
+
+* -**D, --save-dev** 安装包信息将加入到devDependencies（开发阶段的依赖），所以开发阶段一般使用它
+
+	npm install gulp --save-dev 或 npm install gulp -D
+
+package.json 文件的 devDependencies字段：
+
+	"devDependencies": {
+	    "gulp": "^3.9.1"
+	}
+
+* **-O, --save-optional** 安装包信息将加入到optionalDependencies（可选阶段的依赖）
+
+>npm install gulp --save-optional 或 npm install gulp -O
+
+package.json 文件的optionalDependencies字段：
+
+	"optionalDependencies": {
+	    "gulp": "^3.9.1"
+	}
+
+* -**E, --save-exact** 精确安装指定模块版本
+
+>npm install gulp --save-exact 或 npm install gulp -E
+
+输入命令npm install gulp -ES，留意package.json 文件的 dependencies 字段，以看出版本号中的^消失了
+
+	"dependencies": {
+	    "gulp": "3.9.1"
+	}
+
+###`npm uninstall`
+	npm uninstall [<@scope>/]<pkg>[@<version>]... [-S|--save|-D|--save-dev|-O|--save-optional]
+	aliases: remove, rm, r, un, unlink
+
+如卸载开发版本的模块
+
+	npm uninstall gulp --save-dev
+
+###`npm update`
+	npm update [-g] [<pkg>...]
+
+###`npm outdated`
+此命令会列出所有已经过时的包，可以及时进行包的更新
+
+	npm outdated [[<@scope>/]<pkg> ...]
+
+###`npm remove`
+###`npm root`
+输出 本地依赖安装node_modules的路径
+
+###`npm root -g`
+输出 全局安装node_modules的路径
+
+###`npm help`
+帮助
+
+	npm help <command>
+
+###`npm list`
+输出安装模块列表
+
+###`npm config`
+管理npm的配置路径
+
+	npm config set <key> <value> [-g|--global]
+	npm config get <key>
+	npm config delete <key>
+	npm config list
+	npm config edit
+	npm get <key>
+	npm set <key> <value> [-g|--global]
+
+对于config这块用得最多应该是**设置代理，解决npm安装一些模块失败的问题**
+例如因为公司的防火墙原因，无法完成任何模块的安装，这个时候设置代理可以解决
+
+	npm config set proxy=http://dev-proxy.oa.com:8080
+
+又如国内的网络环境问题，某官方的IP可能被和谐了，幸好国内有好心人，搭建了镜像，此时我们简单设置镜像
+
+	npm config set registry="http://r.cnpmjs.org"
+
+###`npm cache`
+	npm cache add <tarball file>
+	npm cache add <folder>
+	npm cache add <tarball url>
+	npm cache add <name>@<version>
+	npm cache ls [<path>]
+	npm cache clean [<path>]
+
+最常用命令无非清除npm本地缓存
+
+	npm cache clean
+
+###`npm start`
+	npm start [--<args>]
+
+该命令写在package.json文件scripts的start字段中，可以自定义命令来配置一个服务器环境和安装一系列的必要程序，如
+
+	"scripts": {
+	    "start": "gulp -s"
+	}
+
+如果package.json文件没有设置start，则将直接启动node server.js
+
+###`npm stop`
+	npm stop [--<args>]
+
+###`npm restart`
+	npm restart [--<args>]
+
+###`npm test`
+	npm test [-- <args>]
+	npm tst [-- <args>]
+
+该命令写在package.json文件scripts的test字段中，可以自定义该命令来执行一些操作，如
+
+	"scripts": {
+	    "test": "gulp release"
+	}
+
+此时在cmd中输入npm test命令相当于执行gulpfile.js文件自定义的release命令。
+
+###`npm version`
+ 查看模块版本
+
+	npm version [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease | from-git]
+	'npm [-v | --version]' to print npm version
+	'npm view <pkg> version' to view a package's published version
+	'npm ls' to inspect current package/dependency versions
+
+###`npm publish`
+发布模块
+
+	npm publish [<tarball>|<folder>] [--tag <tag>] [--access <public|restricted>]
+	Publishes '.' if no argument supplied
+	Sets tag 'latest' if no --tag specified
+
+###`npm access`
+ 在发布的包上设置访问级别
+
+	npm access public [<package>]
+	npm access restricted [<package>]
+	npm access grant <read-only|read-write> <scope:team> [<package>]
+	npm access revoke <scope:team> [<package>]
+	npm access ls-packages [<user>|<scope>|<scope:team>]
+	npm access ls-collaborators [<package> [<user>]]
+	npm access edit [<package>]
+
+###Package.json 属性说明
+
+| 关键字       | 解释                                                                                                                          |
+| -            |                                                                                                                               |
+| name         | 包名                                                                                                                          |
+| version      | 包的版本号                                                                                                                    |
+| description  | 包的描述                                                                                                                      |
+| homepage     | 包的官网 url                                                                                                                  |
+| author       | 包的作者姓名                                                                                                                  |
+| contributors | 包的其他贡献者姓名                                                                                                            |
+| dependencies | 依赖包列表。如果依赖包没有安装，npm 会自动将依赖包安装在 node_module 目录下                                                   |
+| repository   | 包代码存放的地方的类型，可以是 git 或 svn，git 可在 Github 上                                                                 |
+| main         | main 字段是一个模块ID，它是一个指向你程序的主要项目。就是说，如果你包的名字叫 express，然后用户安装它，然后require("express") |
+| keywords     | 关键字                                                                                                                        |
