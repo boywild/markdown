@@ -1,0 +1,243 @@
+#RSA非对称加密
+
+https://github.com/travist/JSEncrypt
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <title>JavaScript RSA Encryption</title>
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="bin/jsencrypt.min.js"></script>
+    <script type="text/javascript">
+
+      // Call this code when the page is done loading.
+      $(function() {
+
+        // Run a quick encryption/decryption when they click.
+        $('#testme').click(function() {
+
+          // Encrypt with the public key...
+          var encrypt = new JSEncrypt();
+          encrypt.setPublicKey($('#pubkey').val());
+          var encrypted = encrypt.encrypt($('#input').val());
+
+          // Decrypt with the private key...
+          var decrypt = new JSEncrypt();
+          decrypt.setPrivateKey($('#privkey').val());
+          var uncrypted = decrypt.decrypt(encrypted);
+
+          // Now a simple check to see if the round-trip worked.
+          if (uncrypted == $('#input').val()) {
+            alert('It works!!!');
+          }
+          else {
+            alert('Something went wrong....');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <label for="privkey">Private Key</label><br/>
+    <textarea id="privkey" rows="15" cols="65">
+-----BEGIN RSA PRIVATE KEY-----
+MIICXQIBAAKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQ
+WMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNR
+aY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB
+AoGAfY9LpnuWK5Bs50UVep5c93SJdUi82u7yMx4iHFMc/Z2hfenfYEzu+57fI4fv
+xTQ//5DbzRR/XKb8ulNv6+CHyPF31xk7YOBfkGI8qjLoq06V+FyBfDSwL8KbLyeH
+m7KUZnLNQbk8yGLzB3iYKkRHlmUanQGaNMIJziWOkN+N9dECQQD0ONYRNZeuM8zd
+8XJTSdcIX4a3gy3GGCJxOzv16XHxD03GW6UNLmfPwenKu+cdrQeaqEixrCejXdAF
+z/7+BSMpAkEA8EaSOeP5Xr3ZrbiKzi6TGMwHMvC7HdJxaBJbVRfApFrE0/mPwmP5
+rN7QwjrMY+0+AbXcm8mRQyQ1+IGEembsdwJBAN6az8Rv7QnD/YBvi52POIlRSSIM
+V7SwWvSK4WSMnGb1ZBbhgdg57DXaspcwHsFV7hByQ5BvMtIduHcT14ECfcECQATe
+aTgjFnqE/lQ22Rk0eGaYO80cc643BXVGafNfd9fcvwBMnk0iGX0XRsOozVt5Azil
+psLBYuApa66NcVHJpCECQQDTjI2AQhFc1yRnCU/YgDnSpJVm1nASoRUnU8Jfm3Oz
+uku7JUXcVpt08DFSceCEX9unCuMcT72rAQlLpdZir876
+-----END RSA PRIVATE KEY-----</textarea><br/>
+    <label for="pubkey">Public Key</label><br/>
+    <textarea id="pubkey" rows="15" cols="65">
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN
+FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76
+xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4
+gwQco1KRMDSmXSMkDwIDAQAB
+-----END PUBLIC KEY-----</textarea><br/>
+    <label for="input">Text to encrypt:</label><br/>
+    <textarea id="input" name="input" type="text" rows=4 cols=70>This is a test!</textarea><br/>
+    <input id="testme" type="button" value="Test Me!!!" /><br/>
+  </body>
+</html>
+```
+
+使用 JSEncrypt 完成 JavaScript 非对称加密。假定整个加解密过程中使用的密钥如下。
+
+公钥：
+
+```js
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5A/TPEmOQYgT2po11qvjeBUPE
+dqUEz1Z7MeHH7KI2p74pYK8RsvYngy1cH/wnMXmsf+Wb3tmlqNGa7atW8wlpSfXX
+QV9bFECPEVRnESo8xtN7ZAlJFcdRvBVgfVwC3m9HWpVvKnd9NREXIcg5NHh57q7u
+lsGCZJ2VOJm9EIgFEwIDAQAB
+-----END PUBLIC KEY-----
+```
+
+私钥：
+
+```js
+-----BEGIN RSA PRIVATE KEY-----
+MIICXQIBAAKBgQC5A/TPEmOQYgT2po11qvjeBUPEdqUEz1Z7MeHH7KI2p74pYK8R
+svYngy1cH/wnMXmsf+Wb3tmlqNGa7atW8wlpSfXXQV9bFECPEVRnESo8xtN7ZAlJ
+FcdRvBVgfVwC3m9HWpVvKnd9NREXIcg5NHh57q7ulsGCZJ2VOJm9EIgFEwIDAQAB
+AoGBALcfBVVXHBiyC7udSfInET+e8l4oGFjUZwJ0csaQnlV+XadSvLTF7wFYwrKm
+LcsVGxrzU+2c+ssOdrfjeW0MDEjrbd1xtmayP8Kh2/Pg+9jZqj188tTlLwzUW6iz
+KDEpiG5P1f1cbKY+R/BHQIKt7vcd2QMNVctxSkjl1uSvU/ERAkEA7uCuAJsVgmui
+NjDscoXyj+QRFWqDnUNCZqSqjYw7/BC36xYg/Xolw/bqg9aTgua96fv9k9hExOBY
+eNV3mj63bwJBAMZG7J5/vc3bkVwOS3A5E8j4hwCIFDylbKQ8chdulC3wwDLaSRdE
+evUfhAmMev1cc4QiVaXzGKPcS9ko8Gdz2p0CQAftfvjYLMOSTOTdhMtcNKuf1w1N
+5qZOeCKt7lcaQ1dfOqtbpaaj6iLxy+CqO2UJwV3FlinU8JtUEruX4gtFb5MCQGgb
+l2RFuHhdgH5wdwXOwme0rtYFnXKWfWvi3RkWk7FnhtNssBIKf/EzAhYtb+qWX4US
+rhv7f4WSRzUX/NqlBzUCQQCfDpC5/DZ/7RMKbDj7inW2G/3T56jzCdicIAgN0erZ
+jcbB7+8VQLjcw5LFYPwgjjz5v6Amw42VY+dBUNWVEH9C
+-----END RSA PRIVATE KEY-----
+```
+
+##JSEncrypt 使用私钥加密示例：
+
+```js
+// 创建 RSA 对象
+var crypt = new JSEncrypt();
+// 私钥
+var private_key = "-----BEGIN RSA PRIVATE KEY-----...";
+crypt.setPrivateKey(private_key);
+var encrypted = crypt.encrypt('123456');
+```
+
+得到结果：
+
+```js
+bC8nemetJfmenSldUccrHcY+aMVBO1ANYJky42vKhv+8iMmecAmDSalOj/065+AZBRhsWuT0C26A5IJTnI9COpA3L1xV54Mwz8j3Y0DdGRqaAFH+lkibVj/JOsTYfKVWnPMwc0D/EL2IJdi18sct2s3CvGxp7+1sRayKSoPvTa8=
+```
+RSA 加密得到的密文每次都不一样, 因为加入了随机数。
+
+##JSEncrypt 使用公钥解密示例：
+
+```js
+var crypt = new JSEncrypt();
+var private_key = "-----BEGIN RSA PRIVATE KEY-----...";
+crypt.setPrivateKey(private_key);
+var decrypted = crypt.decrypt('123456');
+```
+
+
+##PHP使用私钥加密示例：
+
+```js
+openssl_pkey_new(array('private_key_bits' => 1024));
+```
+
+##PHP 使用公钥加密示例：
+
+```js
+openssl_pkey_new(array('private_key_bits' => 1024));
+```
+
+##JSEncrypt 同时支持自动创建公钥和私钥：
+
+```js
+// 支持 512、1024、2048、4096 key 越长, 生成密钥和加密时间越长
+var crypt = new JSEncrypt({default_key_size: 1024});
+// 获取公钥
+var public_key = crypt.getPublicKey();
+// 获取私钥
+var private_key = crypt.getPrivateKey();
+```
+
+利用 JSEncrypt 可以完成在前端网页对密码等敏感信息进行加密，传输到服务器端再进行解密。
+
+#如何使用CryptoJS的AES方法进行加密和解密
+
+首先准备一份明文和秘钥
+
+```js
+var plaintText = 'aaaaaaaaaaaaaaaa'; // 明文
+var keyStr = 'bbbbbbbbbbbbbbbb'; // 一般key为一个字符串
+```
+
+AES方法是支持AES-128、AES-192和AES-256的，加密过程中使用哪种加密方式取决于传入key的类型，否则就会按照AES-256的方式加密。由于Java就是按照128bit给的，但是由于是一个字符串，需要先在前端将其转为128bit的才行。最开始以为使用CryptoJS.enc.Hex.parse就可以正确地将其转为128bit的key。但是不然...经过多次尝试，需要使用CryptoJS.enc.Utf8.parse方法才可以将key转为128bit的。好吧，既然说了是多次尝试，那么就不知道原因了，后期再对其进行更深入的研究
+
+```js
+// 字符串类型的key用之前需要用uft8先parse一下才能用
+var key = CryptoJS.enc.Utf8.parse(keyStr);  
+```
+由于后端使用的是PKCS5Padding，但是在使用CryptoJS的时候发现根本没有这个偏移，查询后发现PKCS5Padding和PKCS7Padding是一样的东东，使用时默认就是按照PKCS7Padding进行偏移的。
+
+```js
+// 加密
+var encryptedData = CryptoJS.AES.encrypt(plaintText, key, {  
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+});
+```
+
+由于CryptoJS生成的密文是一个对象，如果直接将其转为字符串是一个Base64编码过的，在encryptedData.ciphertext上的属性转为字符串才是后端需要的格式。
+
+```js
+var encryptedBase64Str = encryptedData.toString();
+console.log(encryptedBase64Str);// 输出：'RJcecVhTqCHHnlibzTypzuDvG8kjWC+ot8JuxWVdLgY='
+
+// 需要读取encryptedData上的ciphertext.toString()才能拿到跟Java一样的密文
+var encryptedStr = encryptedData.ciphertext.toString搜索();  
+console.log(encryptedStr);  
+// 输出：'44971e715853a821c79e589bcd3ca9cee0ef1bc923582fa8b7c26ec5655d2e06'
+```
+
+由于加密后的密文为128位的字符串，那么解密时，需要将其转为Base64编码的格式。
+那么就需要先使用方法CryptoJS.enc.Hex.parse转为十六进制，再使用CryptoJS.enc.Base64.stringify将其变为Base64编码的字符串，此时才可以传入CryptoJS.AES.decrypt方法中对其进行解密。
+
+```js
+// 拿到字符串类型的密文需要先将其用Hex方法parse一下
+var encryptedHexStr = CryptoJS.enc.Hex.parse(encryptedStr);
+// 将密文转为Base64的字符串,只有Base64类型的字符串密文才能对其进行解密
+var encryptedBase64Str = CryptoJS.enc.Base64.stringify(encryptedHexStr);  
+//使用转为Base64编码后的字符串即可传入CryptoJS.AES.decrypt方法中进行解密操作。
+var decryptedData = CryptoJS.AES.decrypt(encryptedBase64Str, key, {  
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+});
+```
+
+经过CryptoJS解密后，依然是一个对象，将其变成明文就需要按照Utf8格式转为字符串。
+
+```js
+// 解密后，需要按照Utf8的方式将明文转位字符串
+var decryptedStr = decryptedData.toString(CryptoJS.enc.Utf8);  
+console.log(decryptedStr); // 'aaaaaaaaaaaaaaaa'
+```
+
+综上所述CryptoJS的AES方法进行加解密方法为
+
+```js
+var plaintText = 'aaaaaaaaaaaaaaaa'; // 明文
+var keyStr = 'bbbbbbbbbbbbbbbb'; // 一般key为一个字符
+var key = CryptoJS.enc.Utf8.parse(keyStr);//转换为uft8格式
+//PKCS7Padding加密
+var encryptedData = CryptoJS.AES.encrypt(plaintText, key, {  
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+});
+var encryptedBase64Str = encryptedData.toString();//转换为字符串
+var encryptedStr = encryptedData.ciphertext.toString(); //得到密文
+var encryptedHexStr = CryptoJS.enc.Hex.parse(encryptedStr);//转换为16进制
+var encryptedBase64Str = CryptoJS.enc.Base64.stringify(encryptedHexStr);//转换为base64
+//解密
+var decryptedData = CryptoJS.AES.decrypt(encryptedBase64Str搜索, key, {  
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+});
+//解密奖utf-8格式转换为字符串
+var decryptedStr = decryptedData.toString(CryptoJS.enc.Utf8);//
+console.log(decryptedStr); // 'aaaaaaaaaaaaaaaa'
+```
