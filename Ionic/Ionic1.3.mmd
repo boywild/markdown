@@ -1,0 +1,251 @@
+#指令
+##标题栏
+    <ion-header-bar></ion-header-bar>
+属性：
+1. `align-title`
+设置标题文字的对齐方式。允许值：left | right | center，分别对应左对齐、 右对齐和居中对齐。
+2. `no-tap-scroll`
+当点击标题时，是否将内容区域自动滚动到最开始。允许值：true | false，默认为false。
+
+##页脚栏
+    <ion-footer-bar></ion-footer-bar>   
+
+##header/footer
+样式及内容 
+
+##内容区
+    <ion-content></ion-content>
+属性：
+1. `overflow-scroll`
+使用系统内置的滚动条true|false
+2. `scroll`
+禁止滚动 用于百度地图 或者谷歌地图显示true|false
+
+##滚动框
+    <ion-scroll></ion-scroll>
+1. `direction` 
+内容可以滚动的方向。允许值：x|y|xy。默认为 y
+2. `zooming` 
+是否支持`pinch-to-zoom`(捏拉缩放)。允许值：true|false
+
+##下拉更新数据
+    <ion-refresher></ion-refresher> 
+属性
+1. `on-refresh`
+当用户向下拉动足够的距离并松开时，执行此表达式
+2. `on-pulling`
+当用户开始向下拉动时，执行此表达式
+3. `pulling-text`
+当用户向下拉动时，显示此文本
+4. `pulling-icon`
+当用户向下拉动时，显示此图标
+5. `refreshing-text`
+当用户向下拉动并松开后，显示的等待文字
+6. `refreshing-icon`
+当用户向下拉动并松开后，显示的等待图标。`ionic`推荐使用`spinner` 代替这个属性
+7. `disable-pulling-rotation`
+禁止下拉图标旋转动画
+8. `spinner`
+和`refreshing-icon`的作用一样，但`spinner`是基于`SVG`的动画
+
+注意在刷新完毕后，应当使用作用域的`$broadcast()`方法通知框架：
+
+    $scope.$broadcast('scroll.refreshComplete');
+
+##上拉更新数据
+    <ion-infinite-scroll></ion-infinite-scroll> 
+属性：
+1. `icon`
+可选。载入时显示的图标。默认是`ion-load-d`。`ionic`推荐使用`spinner`代替`icon`属性
+2. `distance`
+可选。距底部距离百分比。当距离底部超过此数值时，执行`on-infinite`。默认为1%
+3. `on-infinite`
+必须。当滚动到底部时执行此表达式
+4. `spinner`
+可选。载入时的`spinner`。默认是`ionSpinner`
+5. `immediate-check`
+可选。是否在载入时立即检查滚动框范围
+
+##脚本接口
+    $ionicScrollDelegate
+可以使用服务`$ionicScrollDelegate`，通过脚本控制滚动容器（`ion-scroll`或`ion-content`）。 `$ionicScrollDelegate`服务提供的常用方法如下：
+
+1. `resize()`
+重新计算容器尺寸。当父元素大小变化时，应当调用此方法
+2. `scrollTop([shouldAnimate])`
+滚动到内容顶部。shouldAnimate参数为true|false，表示是否使用动画展示滚动过程
+3. `scrollBottom([shouldAnimate])`
+滚动到内容底部。shouldAnimate参数为true|false，表示是否使用动画展示滚动过程
+4. `scrollTo(left,top[shouldAnimate])`
+滚动到指定位置。left和top分别表示要滚动到的x坐标和y坐标
+5. `scrollBy(left,top[shouldAnimate])`
+滚动指定偏移量。left和top分别表示要滚动的x偏移量和y偏移量
+6. `getScrollPosition()`
+读取当前视图位置。返回值为一个`JSON`对象，具有`left`和`top`属性，分别表示`x`和`y`坐标
+
+读取当前视图位置。返回值为一个`JSON`对象，具有`left`和`top`属性，分别表示`x`和`y`坐标
+
+```js
+angular.module("myAPP", ["ionic"]).controller("firstCtrl", ["$scope", "$ionicScrollDelegate", function($scope, $ionicScollDelegate) {
+    $scope.items = [];
+    for (var i = 0; i < 100; i++) $scope.items.push(["item ", i + 1].join(""));
+    $scope.gotop = function() {
+        $ionicScollDelegate.scrollTop(true);
+    }
+    $scope.gobottom = function() {
+        $ionicScollDelegate.scrollBottom(true);
+    }
+}]);
+```
+
+#路由
+
+##路由管理介绍
+使用
+```html
+<a ui-sref="xxx"></a>
+<div ui-view></div>
+```
+
+```js
+var app=angular.module('xxx',['ionic'])
+.config(function($stateProvider){
+    $stateProvider.state('name',{
+        url:'',
+        templateUrl:'',
+        controller:'',
+        param:{}
+        })
+    }).controller('xxx',['$scope','$state',function($scope,$state){
+            $state.go('xx')
+        }]);
+
+```
+
+##Ionic中内联模板介绍
+
+    <script type="text/ng-template" id="class.html">
+        this is content
+    </script>
+
+##导航视图
+    <ion-nav-view></ion-nav-view>===<div ui-view></div>
+
+##模板视图
+    <ion-view></ion-view>
+属性：
+1. `view-title`
+视图标题文字
+2. `cache-view`
+是否对这个模板视图进行缓存允许值为：true|false，默认为true
+3. `hide-back-button`
+是否隐藏导航栏中的返回按钮。当模板被载入导航视图时，如果之前有其他的模板，那么在导航栏`ion-nav-bar`上默认会自动 显示返回按钮（使用指令`ion-nav-back-button`定义）。点击该按钮将返回前一个模板。 `hide-back-butto`n的允许值为：true|false ，默认为false 注意：必须在导航栏中显式地声明返回按钮，否则即使将`hide-back-button`属性设为`false`，这个按钮也不会出现
+4. `hide-nav-bar`
+允许值为：true|false ,默认为false
+
+##导航栏 
+    <ion-nav-bar></ion-nav-bar>   
+`ion-nav-bar`和`ion-view`配合使用
+属性:
+1. `align-title`
+标题对齐方式允许值为：left|right|center。默认为center，居中对齐
+2. `no-tap-scroll`
+允许值为：true|false。默认为true，这意味着如果视图中的内容下拉很长，那么在任何时刻 点击导航栏都可以立刻回到内容的开头部分。
+
+##回退按钮
+    <ion-nav-back-button></ion-nav-back-button>
+`ion-nav-back-button`是`ion-nav-bar`中的返回按钮
+
+##视图特定按钮
+    <ion-nav-buttons></ion-nav-buttons>
+`ion-nav-buttons`是`ion-view`中的返回按钮
+属性：
+1. `side `
+在导航条的那一侧放置按钮。允许值：primary|secondary|left|right
+`primary`和`secondary`是平台相关的。比如在`iOS`上，`primary`被映射到左边，而`secondary` 被映射到最右边，但是在`Android`上，`primary`和`secondary`都在最右侧。 `left`和`right`则明确地声明是在左侧还是右侧，与平台无关。
+
+##定制标题内容
+定制标题内容`ion-nav-title`在`ion-view`中使用
+
+```html
+<ion-nav-view></ion-nav-view>
+<ion-nav-bar>
+    <ion-nav-back-button></ion-nav-back-button>
+</ion-nav-bar>    
+<ion-view>
+    <ion-nav-title></ion-nav-title>    
+    <ion-nav-buttons></ion-nav-buttons>
+</ion-view>  
+```
+
+```html
+    <ion-nav-bar align-title="center" class="bar-positive">
+        <ion-nav-back-button></ion-nav-back-button>
+    </ion-nav-bar>
+    <script type="text/ng-template" id="map.html">
+        <ion-view view-title="chentian">
+            <ion-content>
+                <ion-list>
+                    <ion-item ui-sref="music">gogogog</ion-item>
+                </ion-list>
+            </ion-content>
+        </ion-view>
+        <ion-footer-bar class="bar-dark">
+            <h1 class="title">底部</h1>
+        </ion-footer-bar>
+    </script>
+    <script type="text/ng-template" id="music.html">
+        <ion-view view-title="yangli">
+            <ion-content>
+                <ion-item ui-sref="map">gogogog</ion-item>
+            </ion-content>
+        </ion-view>
+
+        <ion-footer-bar class="bar-energized">
+            <h1 class="title">底部</h1>
+        </ion-footer-bar>
+    </script>
+    <ion-nav-view></ion-nav-view>   
+```
+
+##定制视图切换方式 
+    <any ui-sref=".." nav-transition="..">...</any>
+目前支持的转场方式有三种：
+1. `android` android模拟
+2. `ios` ios模拟
+3. `none` 取消转场动画
+
+## 定制视图切换方向 
+    <any ui-sref=".." nav-direction="..">...</any>
+目前支持的选项有：
+1. `forward` 新视图从右向左进入
+2. `back` 新视图从左向右进入
+3. `enter`
+4. `exit`
+5. `swap`
+
+## 导航栏脚本接口 
+**$ionicNavBarDelegate **
+1. `align([direction])` 标题对齐方式
+参数direction是可选的，允许值为：left | right | center，缺省值为center
+2. `showBackButton([show])` 是否显示回退按钮
+参数show是可选的，允许值为：true | false，缺省值为true
+3. `showBar(show)` 是否显示导航栏
+参数show的允许值为：true | false
+4. `title(title)` 设置导航栏标题
+参数title为HTML字符串
+
+## 访问历史 : 
+**$ionicHistory**
+1. `viewHistory()` 返回视图访问历史数据
+2. `currentView()` 返回当前视图对象
+3. `currentHistoryId()` 返回历史ID
+4. `currentTitle([val])` 设置或读取当前视图的标题
+5. `backView()` 返回历史栈中前一个视图对象
+6. `backTitle()` 返回历史栈中前一个视图的标题
+7. `forwardView()` 返回历史栈中的下一个视图对象
+8. `currentStateName()` 返回当前所处状态名
+9. `goBack()` 切换到历史栈中前一个视图
+10. `clearHistory()` 请空历史栈
+11. 除了当前的视图记录，clearHistory()将清空应用的全部访问历史
+#ion-tab

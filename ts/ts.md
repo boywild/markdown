@@ -1,4 +1,4 @@
-
+[TOC]
 
 #字符串新特性
 ##多行字符串
@@ -379,7 +379,7 @@ test1.eat();//chentian
 上面两种写法的唯一区别就是有没有对参数`name`进行申明，声名了就有输出打印值，没有声名就输入`undefined`
 
 ###类的继承
-extends 用来声名类的继承关系
+`extends`用来声名类的继承关系
 ```js
 class Person { 
     constructor(public name: string) { 
@@ -401,8 +401,8 @@ test1.eat();
 var test2 = new Employee('yangli');
 test2.eat();
 ```
-super 调用父类的构造函数或者方法
 
+`super`调用父类的构造函数或者方法
 注意：子类的构造函数必须要调用父类的构造函数
 ```js
 class Person { 
@@ -457,7 +457,7 @@ test2.work();//haha  xixi  blankim eating im working
 test2.doWork();//im working
 ```
 
-如果给doWork加上访问控制符之后就不能直接在外部调用了
+如果给`doWork`加上访问控制符之后就不能直接在外部调用了
 ```js
 class Person { 
     constructor(public name: string) { 
@@ -487,8 +487,8 @@ test2.work();//haha  xixi  blankim eating im working
 test2.doWork();//不能直接调用
 ```
 
-#泛型
-
+##泛型
+定义：参数化的类型，一般用来限制集合的内容
 ```js
 //Person即上文中的Person
 var workers:Array<Person>=[];
@@ -496,3 +496,70 @@ workers[0]=new Person('chentian');//正确因为workers是Person的泛型
 workers[1]=new Employee('yangli','1');//正确，因为Employee继承自Person
 workers[2]=2;//错误
 ```
+
+##接口
+定义：用来建立某种代码约定，使得其他开发者在调用某个方法或者创建新的类时必须遵循接口所定义的代码约定
+
+1. `interface`用来定义或者声名一个接口
+2. `implements` 用来声名某一个类实现了一个特定的接口
+
+**接口声名属性**
+```js
+interface iPerson{
+    name:string;
+    age:number;
+}
+class person{
+    constructor(public param:iPerson){
+        console.log('用接口声名属性');
+    }
+}
+var test=new person({
+    name:'yangli',
+    age:26
+    });
+```
+
+**接口声名方法**
+当一个类实现某个接口时，必须得实现这个接口里声名得方法
+```js
+interface Animal{
+    eat();
+}
+class sheep implements Animal{
+    eat(){
+        console.log('im eat grass');
+    }
+}
+class tigger implements Animal{
+    eat(){
+        console.log('im eat meat');
+    }
+}
+```
+
+##模块
+关键字`module` `import`模块可以帮助开发者将代码分割为可重用得单元。开发者可以自己决定将模块中的哪些资源暴露出去供外部使用，哪些资源只在模块内使用。
+和es6中的模块类似
+例如
+```js
+import{xxx,xxx,xxx} from './a';
+export var a;
+export function fun1(){}
+export class test{}
+```
+
+##注解
+注解为程序的元素加上更直观更明了的说明，这些说明信息与程序的业务逻辑无关，而是提供指定的工具或者框架使用的说明
+```js
+@Component({
+    selector:'app-root',
+    templateUrl:'./app.component.html',
+    styleUrls:['./app.component.css']
+    })
+```
+
+##类型定义文件
+类型定义文件用来帮助开发者在TypeScript中使用已有的JavaScript的工具包
+例如JQuery
+文件格式为`*.d.ts`
