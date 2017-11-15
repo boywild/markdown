@@ -249,3 +249,102 @@ var app=angular.module('xxx',['ionic'])
 10. `clearHistory()` 请空历史栈
 11. 除了当前的视图记录，clearHistory()将清空应用的全部访问历史
 #ion-tab
+
+多重路由视图
+
+#侧边栏
+```html
+<ion-side-menus> 
+    <!-- 中间内容 --> 
+    <ion-side-menu-content ng-controller="ContentController"> </ion-side-menu-content> 
+    <!-- 左侧菜单 --> 
+    <ion-side-menu side="left"> </ion-side-menu> 
+    <!-- 右侧菜单 --> 
+    <ion-side-menu side="right"> </ion-side-menu> 
+</ion-side-menus>
+```
+##侧边栏菜单
+    <ion-side-menus></ion-side-menus>
+##侧边栏打开关闭 切换指令
+    <!--切换左侧栏显示状态--> <any menu-toggle="left"></any> 
+    <!--切换右侧栏显示状态--> <any menu-toggle="right"></any>
+menu-close指令用来给元素增加关闭侧栏内容的功能 
+
+    <any menu-close=""></any>
+与menu-toggle指令不同，menu-close不需要指定要关闭的侧栏是哪一边，它 直接将当前打开的侧栏关闭
+
+##主区域容器
+    <ion-side-menu-content></ion-side-menu-content>
+1. drag-content
+是否允许拖动内容打开侧栏菜单
+默认为true 允许值：true|false。当设置为false时，将禁止通过拖动内容打开侧栏菜单
+2. edge-drag-threshold
+是否启用边距检测
+默认为false。允许值：number | true | false
+
+##侧边栏区域容器
+    <ion-side-menu></ion-side-menu>
+1. side
+位于内容区的左边或右边
+side属性是必须的。允许值：left | right。默认值为left
+2. width
+侧边栏的宽度
+width属性是可选的，表示以像素为单位的侧栏菜单宽度。默认为275px
+3. is-enabled
+is-enabled属性是可选的，声明该侧边栏是否可用，允许值为：true | false ，默认为true。 当侧边栏不可用时，拖拽内容或使用切换按钮都无法打开侧栏菜单
+4. expose-aside-when
+侧边栏自动显示条件表达式
+默认情况下，侧边栏是隐藏的，需要用户向左或向右拖动内容，或者通过一个切换按钮来打开。 但是在有些场景下（比如，横放的平板）屏幕宽度足够大，这时，自动地显示侧边栏内容会更 合理。 expose-aside-when属性就是处理这种情况的，和CSS3的@meida类似，expose-aside-when需要 一个CSS表达式，例如：expose-aside-when="(min-width:500px)"，这意味着当屏幕宽度大于 500px时将自动显示侧栏菜单
+
+##脚本中控制侧边栏菜单接口 
+    $ionicSideMenuDelegate
+
+1. `toggleLeft([isOpen])`
+是否打开左侧栏菜单
+参数isOpen是可选的，默认为true ，表示打开左侧栏菜单
+2. `toggleRight([isOpen])`
+是否打开右侧栏菜单
+参数isOpen是可选的，默认为true ，表示打开右侧栏菜单
+3. `getOpenRatio()`
+侧栏菜单打开的宽度占其总宽度比例
+例如，一个100px宽的侧栏菜单，如果打开50px，那么其比例为50%，getOpenRatio()将 返回0.5
+4. `isOpen()`
+当前侧栏菜单是否打开
+不管是左侧栏菜单，还是右侧栏菜单，只要处于打开状态，isOpen()都返回 true
+5. `isOpenLeft()`
+左侧栏菜单是否打开
+当左侧栏菜单处于打开状态时，isOpenLeft()返回true
+6. `isOpenRight()`
+右侧栏菜单是否打开
+当右侧栏菜单处于打开状态时，isOpenRight()返回true
+7. `canDragContent([canDrag])`
+是否允许拖拽内容以打开侧栏菜单
+canDrag参数是可选的，如果canDrag为true，表示允许通过拖拽内容打开侧栏菜单
+8. `edgeDragThreshold(value)`
+设置边框距离阈值
+当参数value为false或0时，意味着在内容区域任何位置进行拖拽都可以打开侧栏菜单。 如果参数value为一个数值，意味着只有当拖拽发生的位置距边框不大于此数值时，才能打开 侧栏菜单。 参数value为true等同于将value设置为25。
+
+##ion-tap结合 ion-side-menus一起使用
+
+```html
+<ion-side-menus>
+    <ion-side-menu-content drag-content="true">
+        <ion-tabs class="tabs-icon-top tabs-positive">
+            <!-- Dashboard Tab -->
+            <ion-tab title="tab1" icon-off="ion-ios-pulse" icon-on="ion-ios-pulse-strong" href="#/tab/tab1">
+                <ion-nav-view name="tab1"></ion-nav-view>
+            </ion-tab>
+            <!-- Chats Tab -->
+            <ion-tab title="tab2" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/tab2">
+                <ion-nav-view name="tab2"></ion-nav-view>
+            </ion-tab>
+            <!-- Account Tab -->
+            <ion-tab title="tab3" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/tab3">
+                <ion-nav-view name="tab3"></ion-nav-view>
+            </ion-tab>
+        </ion-tabs>
+    </ion-side-menu-content>
+    <ion-side-menu side="left"></ion-side-menu>
+    <ion-side-menu side="right"></ion-side-menu>
+</ion-side-menus>
+```
