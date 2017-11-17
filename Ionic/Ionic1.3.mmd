@@ -248,4 +248,96 @@ var app=angular.module('xxx',['ionic'])
 9. `goBack()` 切换到历史栈中前一个视图
 10. `clearHistory()` 请空历史栈
 11. 除了当前的视图记录，clearHistory()将清空应用的全部访问历史
+
 #ion-tab
+##ion-tabs 常用设置
+使用方法：
+```html
+<ion-tabs>
+<ion-tab title="xxx">...</ion-tab> <ion-tab title=" xxx ">...</ion-tab> ...
+ </ion-tabs>
+```
+
+注意:
+1. 不要把 ion-tabs 指令放在 ion-content 之内
+2. ion-tab 的内容应当放入 ion-view 指令内，否则 ionic 在计算布局时可能出错
+3. AngularJS 编译后，ion-tabs 元素将被应用.tabs 样式，因此我们可以使用 相关的样式调整 ion-tabs 的外观
+
+###声明条带风格
+    tabs-striped 带条纹风格
+    tabs-standard 声明条带风格
+###声明位置
+    tabs-icon-top icon在文字上面
+    tabs-icon-bottom icon在文字下面
+    tabs-top tab在页面顶部
+    tabs-bottom tab在页面底部
+###ion-tabs下面的ion-tab标题文字、图标和徽章显示隐藏
+    title 标题文字
+    标题文字是必须的。该属性值将作为选项页的标题文字。
+
+    icon 标题图标
+    使用 icon 属性是可选的，该属性值将用来在标题文字旁边添加一个指定的图标。 这个属性的值将被作为 icon-on 和 icon-off 的默认值
+
+    icon-on 被选中状态的标题图标
+    如果一个选项页被选中，ion-tabs 将使用 icon-on 属性的值绘制图标。如果 icon-on 没有设置，那么 ion-tabs 就使用 icon 属性的值绘制图标
+
+    icon-off 未选中状态的标题图标
+    如果一个选项页没有被选中，ion-tabs 将使用 icon-off 属性的值绘制图标。如果 icon-off 没有设置，那 么 ion-tabs 就使用 icon 属性的值绘制图标
+
+    badge 标题徽章
+    ion-tabs 使用 badge 属性的值在标题文字旁边添加一个圆形的文字标识，通常用来 显示数字。这个属性 是可选的，可以是一个具体的值，也可以是当前作用域上的 一个变量
+
+    badge-style 标题徽章样式
+    使用 badge-style 属性设置徽章的样式， 比如配色方案:barge-{color}
+
+    hiden 隐藏
+    hidden 属性是当前作用域上的表达式。 当其值为 true 时，选项页将不可见
+
+    disabled 禁止
+    disabled 属性是当前作用域上的表达式。当值为 true 时，选项页将不响应 用户的点击
+
+##ion-tabs 事件 和 $ionicTabsDelegate
+###ion-tab 事件
+1. `on-select` 选中事件
+可选。选项页从未选中状态切换到选中状态时执行此表达式
+2. `on-deselect` 未选中事件
+可选。选项页从选中状态切换到未选中状态时执行此表达式
+3. `ng-click` 点击事件
+可选。选项页被点击时执行此表达式。如果这个属性被设置，那么`ion-tabs`将不会 自动切换选项页，调 用者需要手动调用`$ionicTabsDelegate`的`select()`方法进行 选项页切换
+
+###ionicTabsDelegate
+使用$ionicTabsDelegate服务，我们可以在脚本中控制选项卡对象`select(index)`选中指定的选项页
+`index`参数从`0`开始，第一个选项页的`index`为`0`，第二个为`1`，依次类推。
+`selectedIndex()` 返回当前选中选项页的索引号
+
+##ion-tabs 路由详解
+###触发状态迁移的几种方式(通俗的讲就是页面跳转的几种方式)
+1. 调用$state.go() 方法，这是一个高级的便利方法;
+2. 点击包含 ui-sref 指令的链接 <a ui-sref="state1">Go State 1</a> 3. 导航到与状态相关联的 url。
+
+###通过 href 方式页面切换需要指定 url
+
+###ionic 中结合 tab 状态嵌套的几种方式 状态可以相互嵌套。有三个嵌套的方法:
+1.使用“点标记法”，例如:.state('contacts.list', {})
+2.使用 parent 属性，指定一个父状态的名称字符串，例如:parent: 'contacts'
+3.使用 parent 属性，指定一个父状态对象，例如:parent: contacts(contacts 是一个状态对象)
+
+###基于对象的状态
+如果你不喜欢使用基于字符串的状态，您还可以使用基于对象的状态。name 属性将在状态对象内部设 置，在所有的子状态对象中设置 parent 属性为父状态对象，像下面这样:
+
+
+
+###ionic 路由结合 tap 实现页面切换
+1. 在 ionic tab 中定义 ion-nav-view 并且加上 name 属性
+```html
+<ion-nav-view name="news-list"></ion-nav-view>
+```
+
+2. 在`ionic $stateProvider.state`中定义view并对应`ion-nav-view`中的`name`属性
+
+
+###ionic states抽象状态
+abstract一个抽象的状态可以有子状态但不能显式激活，它将被隐性激活当其子状态被激活时。下面是两个最常用的抽象状态的示例:
+1. 为所有子状态预提供一个基 url
+2. 在父状态中设置 template 属性，子状态对应的模板将插入到父状态模板中的 ui-view(s)中
+
