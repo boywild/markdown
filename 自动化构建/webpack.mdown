@@ -21,13 +21,13 @@ commonjs规范
 新建`style.css`,在样式表中随便新建几行样式`html,body{background: #f00;}`，在`hello.js`文件中`require('style-loader!css-loader!./style.css')`，执行命令`webpack hello.js hello.bundle.js`(**注意：**用`webpack`加载`css`需要用到`css-loader`，行内样式需要用到`style-loader`。安装`loader npm install css-loader style-loader --save-dev)`
 `css-loader`用来将`style.css`打包到`hello.bundle.js`文件中，使`webpack`能处理.css文件，如果将`css-loader`处理后的文件，引入到页面中后(在这个例子中引入页面的是`hello.bundle.js`)，`style-loader`则会将`style.css`中的样式以`<style></style>`的形式插入到`head`中
 
-如果在页面中没有加载这两个`loader`也可以在命令行中直接加载`loader` `webpack hello.js hello.bundle.js --module-bind 'css=style-loader!css-loader'`
+如果在页面中没有加载这两个`loader`也可以在命令行中直接加载`loader` `webpack hello.js hello.bundle.js --module-bind "css=style-loader!css-loader"`
 
 输入`webpack`可以查看`webpack`中有哪些配置项
 `webpack hello.js hello.bundle.js --watch` 用来监听文件，如果文件有变化则自动编译打包
 `webpack hello.js hello.bundle.js --progress` 用来查看打包的进度
-`webpack hello.js hello.bundle.js --display-module` 用来查看打包的模块
-`webpack hello.js hello.bundle.js --display-reson` 用来查看打包的原因
+`webpack hello.js hello.bundle.js --display-modules` 用来查看打包的模块
+`webpack hello.js hello.bundle.js --display-resons` 用来查看打包的原因
 
 
 ##二、webpack基本配置
@@ -68,11 +68,23 @@ module.exports = {
 
 * **2-2**`webpack`配置的`entry`和`output`
 `entry`是入口文件
-**①**`entry`可以是一个数组
+**①**`entry`是字符串(单入口)
+```js
+    {
+        context: __dirname + "/app",
+        entry: "./entry",
+        output: {
+            path: __dirname + "/dist",
+            filename: "bundle.js"
+        }
+    }
+```
 
-	entry:['a.js','main.js']
+**②**`entry`可以是一个数组主要是为了解决两个平行、没有相互依赖的js想打包在一起
 
-**②**`entry`可以是一个对象用于多入口的情况下
+    entry:['a.js','main.js']
+
+**③**`entry`可以是一个对象用于多入口的情况下，这种情况适用于多页面key是chunkname、value表示entry
 
 	entry:{
 		page1:'./page1'
@@ -83,6 +95,8 @@ module.exports = {
     output: {
         path: _dirname+'/built',//输出路径
         filename: '[name].js'//输出文件名
+        filename: '[name]-[hash].js'//输出文件名
+        filename: '[name]-[chunkhash].js'//输出文件名
     }
 
 注意，在不同的版本下可能会报路径不是绝对路径的错误，解决办法为
@@ -141,14 +155,16 @@ plugins: [
     new htmlWebpackPlugin({
         template:'index.html',
         inject:'head',
-        title:'webpack is good'
+        filename:'index-[hash].html',
+        title:'webpack is good'//传参
+        date:new Date()//传参
     })
 ]
 ```
 在html的title中，以如下的方式引用
 
 ```html
-<title><%= htmlWebpackPlugin.options.plugins.title %></title>
+<title><%= htmlWebpackPlugin.options.title %></title>
 ```
 <%= htmlWebpackPlugin.options.title %>这种方式的引用在模板中的任何一个位置都可以，例如
 
@@ -226,7 +242,7 @@ minify:{
 
 * **3-3**自动化生成项目中的html文件(下)
 
-多文件形式
+多文件形式/多页面应用
 
 ```js
 var htmlWebpackPlugin = require('html-webpack-plugin');
@@ -341,9 +357,40 @@ htmlWebpackPlugin.files.chunks.main.entry.substr()得到文件真实路径
 
 ##四、处理项目中的资源文件
 * **4-1**什么是loader以及loader的特性
+用来处理资源文件处理完得到一个新资源
 
+使用loader
+require('style-loader!css-loader!./style.css')
+webpack hello.js hello.bundle.js --module-bind "css=style-loader!css-loader" --watch
+
+配置
+```js
+{
+    module:{
+        rules:[
+            {test:/\.jade$/,use:'jade'},
+            {test:/\.css$/,use:'style!css'},
+            {test:/\.css$/,use:[
+                { loader: 'style-loader' },
+                {
+                  loader: 'css-loader',
+                  options: {
+                    modules: true
+                  }
+                }
+            ]},
+        ]
+    }
+}
+//行内使用?后面使用参数?key=value&foo=bar/?{"key":"value","foo":"bar"}
+import Styles from 'style-loader!css-loader?modules!./styles.css';
+//cli
+webpack --module-bind jade-loader --module-bind 'css=style-loader!css-loader'
+```
 
 * **4-2**使用babel-loader转换ES6代码
+
+npm install --save-dev babel-loader babel-core babel-preset-env
 
 ```html
 webpack-demo
@@ -363,10 +410,10 @@ webpack-demo
 
 ```js
 module:{
-    loaders:[
+    rules:[
         {
             test:'/\.js$/',
-            loader:'babel',
+            use:'babel-loader',
             exclude:'./node_modules/',//提高打包速度
             include:'./src/',//提高打包速度
             query:{
@@ -392,20 +439,25 @@ presets:['latest']也可以放在package.json文件中
 }
 ```
 
+注意，webpack目前只在您的node_modules文件夹中搜索加载器。如果这些加载器是在您的node_modules文件夹之外定义的，那么您需要使用resolveLoader属性来获得webpack来包含您的loader。例如，假设您的自定义加载器包含在一个名为loaders的文件夹中。您需要在配置文件中添加以下内容:
+
+    resolveLoader: {
+        modules: ['node_modules', path.resolve(__dirname, 'loaders')]
+    }
+
 path.resolve(__dirname+'')，用来将相对路径改为绝对路径
 
 cnpm install --save-dev babel-preset-latest
 cnpm install --save-dev babel
 
 注意：在webpack2.0中 有些不一样
-npm install --save-dev babel-loader babel-core babel-preset-env
 
 ```js
 module: {
     rules: [
         {
             test:  /\.js$/,
-            loader: 'babel-loader',
+            use: 'babel-loader',
             exclude:  path.resolve(__dirname + 'node_modules'),
             include: path.resolve(__dirname + 'src'),
             query: {
