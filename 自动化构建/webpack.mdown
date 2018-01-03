@@ -1,4 +1,4 @@
-##一、webpack基本介绍
+##一、webpack3.x.x基本介绍
 * **1-1**webpack基本介绍
 webpack的概念和作用
 模块打包器
@@ -27,7 +27,7 @@ commonjs规范
 `webpack hello.js hello.bundle.js --watch` 用来监听文件，如果文件有变化则自动编译打包
 `webpack hello.js hello.bundle.js --progress` 用来查看打包的进度
 `webpack hello.js hello.bundle.js --display-module` 用来查看打包的模块
-`webpack hello.js hello.bundle.js --display-reson` 用来查看打包的原因
+`webpack hello.js hello.bundle.js --display-resons` 用来查看打包的原因
 
 
 ##二、webpack基本配置
@@ -68,23 +68,47 @@ module.exports = {
 
 * **2-2**`webpack`配置的`entry`和`output`
 `entry`是入口文件
-**①**`entry`可以是一个数组
+
+**①**`entry`可以是一个字符串
+
+    entry:'a.js'
+
+**②**`entry`可以是一个数组
+数组中的文件一般是有相互依赖关系的，或者是没有互相依赖关系但是又处于某些原因需要将它们打包在一起
 
 	entry:['a.js','main.js']
 
-**②**`entry`可以是一个对象用于多入口的情况下
+**③**`entry`可以是一个对象(`{key:value}`)常用于多页面(多入口)的情况下配置
+**key**
+key可以是简单的字符串，比如：'app', 'main','entry-1'等。并且对应着output.filename配置中的[name]变量key还可以是路径字符串。此时webpack会自动生成路径目录，并将路径的最后作为[name]。这个特性在多页面配置下也是很有用的
+```js
+entry: {
+    'path/of/entry': './deep-app.js',
+    'app': './app.js'
+},
+output: {
+    path: './output',
+    filename: '[name].js'
+}
+```
+**value**
+value如果是字符串，而且必须是合理的node require函数参数字符串。比如文件路径：'./app.js'(require('./app.js'))；比如安装的npm模块：'lodash'(require('lodash'))
+value如果是数组，则数组中元素需要是上面描述的合理字符串值。数组中的文件一般是没有相互依赖关系的，但是又处于某些原因需要将它们打包在一起。比如：
 
-	entry:{
-		page1:'./page1'
-		page2:['entry1.js','entry2.js']
-	}
+```js
+entry:{
+	page1:'./page1'
+	page2:['entry1.js','entry2.js']
+}
+```
+
 在`entry`是多入口的情况下，output也应该是多个输出 `filename`有三个可选参数 `[name]`、`[hash]`、`[chunkhash]`
-
-    output: {
-        path: _dirname+'/built',//输出路径
-        filename: '[name].js'//输出文件名
-    }
-
+```js
+output: {
+    path: _dirname+'/built',//输出路径
+    filename: '[name].js'//输出文件名
+}
+```
 注意，在不同的版本下可能会报路径不是绝对路径的错误，解决办法为
 
 ```js
@@ -316,36 +340,90 @@ module.exports = {
     ]
 }
 ```
-main.html中会生成 a.js b.js c.js
-a.html中会生成b.js c.js
-b.html中会生成a.js c.js
-c.html中会生成a.js b.js
+`main.html`中会生成 `a.js b.js c.js`
+`a.html`中会生成`b.js c.js`
+`b.html`中会生成`a.js c.js`
+`c.html`中会生成`a.js b.js`
 
 **将生成的脚本变成内联脚本**
 
 ```js
 compilation.assets[htmlWebpackPlugin.files.chunks.main.entry].source()
 ```
-如果在申明publicPath的情况下代码应该是这样
+如果在申明`publicPath`的情况下代码应该是这样
 
 ```js
 compilation.assets[htmlWebpackPlugin.files.chunks.main.entry.substr(htmlWebpackPlugin.files.publicPath.length)].source()
 ```
-htmlWebpackPlugin.files.publicPath.length 得到publicPath的长度例如 https://www.baidu.com
-htmlWebpackPlugin.files.chunks.main.entry.substr()得到文件真实路径
-最后用compilation.assets[].source()得到内容
-在main.js已经以内联的方式插入到文档，那么多后续的出来main.js则不需要任何操作，可以在index.html里面写入这样的模板语法，来判断是否是main.js以外的文件，如果不是则插入
+`htmlWebpackPlugin.files.publicPath.length` 得到`publicPath`的长度例如 `https://www.baidu.com`
+`htmlWebpackPlugin.files.chunks.main.entry.substr()`得到文件真实路径
+最后用`compilation.assets[].source()`得到内容
+在`main.js`已经以内联的方式插入到文档，那么多后续的出来`main.js`则不需要任何操作，可以在`index.html`里面写入这样的模板语法，来判断是否是`main.js`以外的文件，如果不是则插入
 
 
 
 
 ##四、处理项目中的资源文件
 * **4-1**什么是loader以及loader的特性
+加载器是应用于模块源代码的转换。它们允许您在导入或“加载”它们时预处理文件。因此，加载器就像是其他构建工具中的“任务”，并提供了一种强大的方法来处理前端构建步骤。加载器可以将文件从不同的语言(如打字稿)转换为JavaScript，或者将内联图像转换为数据url。加载器甚至允许您直接从JavaScript模块导入CSS文件
 
+有3种使用loader的方式
+1. 在webpack.config.js文件中指定
+```js
+module: {
+    rules: [{
+        test: /\.css$/,
+        use: [{
+            loader: 'style-loader'
+        },
+        {
+            loader: 'css-loader',
+            options: {
+                modules: true
+            }
+        }]
+    },
+    {
+        test: /\.jsx?$/,
+        include: [path.resolve(__dirname, "app")],
+        exclude: [path.resolve(__dirname, "app/demo-files")],
+        issuer: {
+            test,
+            include,
+            exclude
+        },
+        enforce: "pre",
+        enforce: "post",
+        loader: "babel-loader",
+        options: {
+            presets: ["es2015"]
+        },
+    },
+    {
+        test: /\.html$/,
+        use: [
+        // apply multiple loaders and options
+        "htmllint-loader", {
+            loader: "html-loader",
+            options: {}
+        }]
+    },
+    ]
+}
+```
+2. 在每个import语句中显式地指定它们 
+`require('style-loader!css-loader!./style.css')`
+`import Styles from 'style-loader!css-loader?modules!./styles.css'`
+3. 在命令行中使用 
+`webpack --module-bind 'css=style-loader!css-loader'`
+`webpack --module-bind jade-loader --module-bind 'css=style-loader!css-loader'`
 
 * **4-2**使用babel-loader转换ES6代码
 
 ```html
+cnpm install --save-dev babel-loader babel-core babel-preset-es2015
+cnpm install babel-preset-env --save-dev
+
 webpack-demo
 -dist
 -node_modules
@@ -362,82 +440,93 @@ webpack-demo
 ```
 
 ```js
-module:{
-    loaders:[
-        {
-            test:'/\.js$/',
-            loader:'babel',
-            exclude:'./node_modules/',//提高打包速度
-            include:'./src/',//提高打包速度
-            query:{
-                presets:['latest']
+const htmlWebpackPlugin=require('html-webpack-plugin');
+const path = require('path');
+module.exports={
+    entry:'./src/app.js',
+    output:{
+        path:__dirname+'/dist',
+        filename:'[name].bundle.js'
+    },
+    module:{
+        rules:[
+            {
+                test:/\.js$/,
+                include:path.resolve(__dirname, "src"),
+                exclude: path.resolve(__dirname, "node_modules"),
+                use:{
+                    loader: "babel-loader",
+                    options:{
+                        "presets": [
+                          "es2015"
+                        ]
+                    }
+                }
             }
-        }
+        ]
+    },
+    plugins:[
+        new htmlWebpackPlugin({
+            title:'app',
+            inject:'head',
+            template:'index.html',
+            filename:'index.html',
+            minify:{
+                collapseWhitespace:true
+            }
+        })
     ]
 }
 ```
 
-query用来指定额外的参数。presets:['latest']用来指定babel将要处理js的版本，版本可能有如下几种或者更多中情况ES2015 ES2016 ES2017，latest指定最近的三个版本
-presets:['latest']也可以放在package.json文件中
+
+`presets:['latest']`也可以放在`package.json`文件中
 ```js
 "babel":{
-    "presets":["latest"]
+      "presets": [
+        "es2015"
+      ]
 }
 ```
 
-或者放在.babelrc中
+或者放在`.babelrc`中
 ```js
 {
-    presets:["latest"]
+  "presets": [
+    "es2015"
+  ]
 }
 ```
 
-path.resolve(__dirname+'')，用来将相对路径改为绝对路径
+    path.resolve(__dirname+'')，用来将相对路径改为绝对路径
 
-cnpm install --save-dev babel-preset-latest
-cnpm install --save-dev babel
-
-注意：在webpack2.0中 有些不一样
-npm install --save-dev babel-loader babel-core babel-preset-env
-
-```js
-module: {
-    rules: [
-        {
-            test:  /\.js$/,
-            loader: 'babel-loader',
-            exclude:  path.resolve(__dirname + 'node_modules'),
-            include: path.resolve(__dirname + 'src'),
-            query: {
-                presets: ['env']
-            }
-        }
-    ]
-}
-```
-**注意：**加入include配置项会导致babel不处理es6语法，原因暂不明
+**注意：**加入`include`配置项会导致`babel`不处理`es6`语法，原因暂不明
 
 * **4-3**处理项目中的css
-
-postcss-loader
-autoprefixer
-autoprefixer是postcss-loader的一个子集
+`postcss-loader`
+`autoprefixer是postcss-loader的一个子集`
+`postcss`用在`css-loader`和`style-loader`之后，用在`sass|less|stylus-loader`之前
 
 ```js
 module: {
     rules: [{
-            test: /\.js$/,
-            loader: 'babel-loader',
-            exclude: path.resolve(__dirname + 'node_modules'),
-            query: {
-                presets: ['env']
+            test:/\.js$/,
+            include:__include,
+            exclude: __exclude,
+            use:{
+                loader: "babel-loader",
+                options:{
+                    "presets": [
+                      "es2015"
+                    ]
+                }
             }
         },
         {
             test: /\.css$/,
             use: [
                 'style-loader',
-                'css-loader?importLoaders=1',
+                {loader:'css-loader', options: {importLoaders: 1}},
                 {
                     loader: 'postcss-loader',
                     options: {
@@ -453,20 +542,71 @@ module: {
     ]
 }
 ```
- loader的执行顺序从右向左
-?importLoaders=1!是css-loader这个loader后面的参数，意思是在postcss-loader后制定一个处理import样式的命令
 
-
-
+注意：
+1. `loader`的执行顺序从右向左
+2. `style-loader!css-loader?importLoaders=1!postcss-loader`
+3. `?importLoaders=1`是`css-loader`后面的参数，意思是在css-loader后指定一个处理import样式的命令
 
 * **4-4**使用less和sass
+
 sass-loader less-loader
 
+    npm install sass-loader node-sass webpack --save-dev
+sass-loader依赖node-sass和webpack
+
+```js
+{
+    test:/\.scss$/,
+    use:[
+        'style-loader',
+        {loader:'css-loader', options: {importLoaders: 1}},
+        {
+            loader:'sass-loader'
+        },
+        {
+            loader: 'postcss-loader',
+            options: {
+                plugins: function() {
+                    return [
+                        require('autoprefixer')
+                    ];
+                }
+            }
+        }
+    ]
+}
+```
+
 * **4-5**处理模板文件
-html-loader
+`html-loader`
+
+```js
+{
+    test:/\.html$/,
+    loader:'html-loader'
+}
+```
+
+`ejs-loader`
+```js
+{
+    test:/\.tpl$/,
+    loader:'ejs-loader'
+}
+```
+
 
 * **4-6**处理图片及其他文件
-file-loader url-loader
+file-loader url-loader用来处理图片
+url-loader和fileloader差不多，但是可以指定limit参数，当图片大小，小雨limit时由url-loader处理成base64，当图片大小大于imit时就由file-loader处理成路径
+
+image-webpack-loader用来压缩图片
+
+在模版中使用相对路径图片的方法
+```js
+${require('../../assets/bg.png')}
+```
 
 
 ```js
@@ -554,5 +694,91 @@ module.exports = {
 }
 
 ```
+
+
+```js
+const htmlWebpackPlugin=require('html-webpack-plugin');
+const path = require('path');
+const __include=path.resolve(__dirname, "src");
+const __exclude=path.resolve(__dirname, "node_modules");
+module.exports={
+    entry:'./src/app.js',
+    output:{
+        path:__dirname+'/dist',
+        filename:'[name].bundle.js'
+    },
+    module:{
+        rules:[
+            {
+                test:/\.js$/,
+                include:__include,
+                exclude: __exclude,
+                use:{
+                    loader: "babel-loader",
+                    options:{
+                        "presets": [
+                          "es2015"
+                        ]
+                    }
+                }
+            },
+            {
+                test:/\.html$/,
+                loader:'html-loader'
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    {loader:'css-loader', options: {importLoaders: 1}},
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: function() {
+                                return [
+                                    require('autoprefixer')
+                                ];
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                test:/\.scss$/,
+                use:[
+                    'style-loader',
+                    {loader:'css-loader', options: {importLoaders: 1}},
+                    {
+                        loader:'sass-loader'
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: function() {
+                                return [
+                                    require('autoprefixer')
+                                ];
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    plugins:[
+        new htmlWebpackPlugin({
+            title:'app',
+            inject:'body',
+            template:'index.html',
+            filename:'index.html',
+            minify:{
+                collapseWhitespace:true
+            }
+        })
+    ]
+}
+```
+
+https://github.com/boywild/webpack3.x.x-demo
 
 

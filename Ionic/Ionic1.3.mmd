@@ -337,9 +337,9 @@ var app=angular.module('xxx',['ionic'])
 
 
 ###ionic states抽象状态
-abstract一个抽象的状态可以有子状态但不能显式激活，它将被隐性激活当其子状态被激活时。下面是两个最常用的抽象状态的示例:
+`abstract`一个抽象的状态可以有子状态但不能显式激活，它将被隐性激活当其子状态被激活时。下面是两个最常用的抽象状态的示例:
 1. 为所有子状态预提供一个基 url
-2. 在父状态中设置 template 属性，子状态对应的模板将插入到父状态模板中的 ui-view(s)中
+2. 在父状态中设置`template`属性，子状态对应的模板将插入到父状态模板中的 `ui-view(s)`中
 
 多重路由视图
 
@@ -362,28 +362,28 @@ abstract一个抽象的状态可以有子状态但不能显式激活，它将被
 menu-close指令用来给元素增加关闭侧栏内容的功能 
 
     <any menu-close=""></any>
-与menu-toggle指令不同，menu-close不需要指定要关闭的侧栏是哪一边，它 直接将当前打开的侧栏关闭
+与`menu-toggle`指令不同，`menu-close`不需要指定要关闭的侧栏是哪一边，它 直接将当前打开的侧栏关闭
 
 ##主区域容器
     <ion-side-menu-content></ion-side-menu-content>
-1. drag-content
+1. `drag-content`
 是否允许拖动内容打开侧栏菜单
 默认为true 允许值：true|false。当设置为false时，将禁止通过拖动内容打开侧栏菜单
-2. edge-drag-threshold
+2. `edge-drag-threshold`
 是否启用边距检测
 默认为false。允许值：number | true | false
 
 ##侧边栏区域容器
     <ion-side-menu></ion-side-menu>
-1. side
+1. `side`
 位于内容区的左边或右边
 side属性是必须的。允许值：left | right。默认值为left
-2. width
+2. `width`
 侧边栏的宽度
 width属性是可选的，表示以像素为单位的侧栏菜单宽度。默认为275px
-3. is-enabled
+3. `is-enabled`
 is-enabled属性是可选的，声明该侧边栏是否可用，允许值为：true | false ，默认为true。 当侧边栏不可用时，拖拽内容或使用切换按钮都无法打开侧栏菜单
-4. expose-aside-when
+4. `expose-aside-when`
 侧边栏自动显示条件表达式
 默认情况下，侧边栏是隐藏的，需要用户向左或向右拖动内容，或者通过一个切换按钮来打开。 但是在有些场景下（比如，横放的平板）屏幕宽度足够大，这时，自动地显示侧边栏内容会更 合理。 expose-aside-when属性就是处理这种情况的，和CSS3的@meida类似，expose-aside-when需要 一个CSS表达式，例如：expose-aside-when="(min-width:500px)"，这意味着当屏幕宽度大于 500px时将自动显示侧栏菜单
 
@@ -439,3 +439,56 @@ canDrag参数是可选的，如果canDrag为true，表示允许通过拖拽内�
     <ion-side-menu side="right"></ion-side-menu>
 </ion-side-menus>
 ```
+
+#ionic 列表
+##ion-list/ion-item
+```html
+<ion-list>
+    <ion-item>...</ion-item>
+    <ion-item>...</ion-item>
+</ion-list>
+```
+1. `type` 列表种类
+type 属性是可选的，可用来设置列表的种类: list-inset | card。这两种列表 都产生内嵌的 效果，区别在于 card 列表有边框的阴影效果。
+2. `show-delete` 是否显示成员内的 delete 按钮
+show-delete 属性是可选的。如果在成员内有 delete 按钮(ion-delete-button)，使用这个 属 性来通知列表是否显示元素删除按钮。允许的值为:true | false
+3. `show-reorder` 是否显示成员内的 reorder 按钮
+show-reorder 属性是可选的。如果在成员内有 reorder 按钮(ion-reorder-button)，使用这个
+属性来通知列表是否显示元素重排序按钮。允许的值为:true | false
+4. `can-swipe` 是否支持滑动方式显示成员 option 按钮
+can-swipe 属性是可选的。如果在成员内有 option 按钮(ion-option-button)，使用这个 属性 来允许或禁止通过向左滑动成员来打开 option 按钮。允许的值为:true | false ，默认为 true。
+
+##ion-list/ion-item成员
+ion-item 有三种预定义的按钮: 
+1. `ion-option-button`选项按钮
+一个 ion-item 内可以包含多个选项按钮。选项按钮是隐藏的，需要用户向左 滑动成员，以 显示选项按钮。可以使用 ion-list 的 can-swipe 属性允许或禁止 滑动开启选项按钮。
+使用 ng-click 指令来挂接点击事件监听函数，其原型如下:
+var optionListener = function(item){...}
+ionic 在捕捉到用户的点击事件时，将调用此函数，并传入当前的 item 对象。
+2. `ion-delete-button`删除按钮
+一个 ion-item 内最多有一个删除按钮。删除按钮在显示时总是位于成员的最 左端。可以使 用 ion-list 的 show-delete 属性显示或隐藏删除按钮
+使用 ng-click 指令来挂接点击事件监听函数，其原型如下:
+var deleteListener = function(item){...}
+ionic 在捕捉到用户的点击事件时，将调用此函数，并传入当前的 item 对象。
+3. `ion-reorder-button`重排按钮
+一个 ion-item 内最多有一个重排按钮。重排按钮在显示时总是位于成员的最右端。可以使用 ion-list 的show-reorder属性显示或隐藏重排按钮
+使用on-reorder属性来挂接重排事件监听函数，其原型如下: 
+var reorderListener = function(item,$fromIndex,$toIndex){...}
+ionic 在捕捉到用户的重排事件时，将调用此函数，并传入当前的 item 对象、原 序号及目标 序号。
+
+
+##collection-repeat高性能的ng-repeat
+collection-repeat 指令和 ng-repeat 指令类似，但是更适用于大数据量 的列表数据，这是因 为，它只将处于可视区域的数据渲染到 DOM 上:
+<any collection-repeat="...">...</any>
+`collection-repeat` 指令接受一个枚举表达式，同时可以附加以下的属性:
+1. `item-width`- 可选。声明重复元素的宽度
+2. `item-height` - 可选。声明重复元素的高度
+3. `item-render-buffer` - 可选。需要载入渲染缓冲区的可视数据前后的数量。默认为3
+4. `force-refresh-images` - 可选。滚动时是否强制刷新图像。允许值:true | false
+
+##脚本接口$ionicListDelegate
+
+如果需要从脚本中控制列表元素，可以使用$ionicListDelegate 服务: showReorder([showReorder]) - 显示/关闭排序按钮
+1. `showReorder`的允许值为:true|false。可以使用一个作用域上的表达式 showDelete([showDelete]) - 显示/关闭删除按钮
+2. `showDelete`的允许值为: true|false。可以使用一个作用域上的表达式 canSwipeItems([canSwipeItems]) - 是否允许通过滑动方式来显示成员选项按钮 canSwipeItems 的允许值为:true | false。可以使用一个作用域上的表达式 closeOptionButtons() - 关闭所有选项按钮
+
