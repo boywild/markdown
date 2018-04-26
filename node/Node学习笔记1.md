@@ -156,37 +156,49 @@ buffer对象的bytes大小
 fs.open() 的同步版
 
 3. `fs.read(fd,buffer,offset,length,position,callback)`
-从指定的文档标识符fd读取文件数据
+从指定的文档标识符`fd`读取文件数据，存放到`buffer`对象中生成一个新的`buffer`对象
 `fd`：通过`open`方法成功打开一个文件返回的一个数字编号
 `buffer`：`buffer`对象
 `offset`：新的内容添加到`buffer`中的起始位置
 `length`：添加到`buffer`中的内容长度
 `position`：读取文件中的起始位置
-`callback`：回调函数接受两个参数`err`,`len`,`newBf`分别是错误信息、`buffer`长度、新的`buffer`对象
+`callback`：回调函数接受3个参数`err`,`len`,`newBf`分别是错误信息、`buffer`长度、新的`buffer`对象
 
 4. `fs.readSync(fd, buffer, offset, length, position)`
-fs.read 函数的同步版本。 返回bytesRead的个数
+`fs.read` 函数的同步版本。 返回`bytesRead`的个数
 
-5. `fs.write(fd, buffer, offset, length[, position], callback)`
-通过文件标识fd，向指定的文件中写入buffer
+5. `fs.write(fd, buffer, offset, length, position, callback)`
+向指定的文件`fd`中写入`buffer`
+`fd`：通过`open`方法成功打开一个文件返回的一个数字编号
+`buffer`：要写入数据的buffer对象
+`offset`：`buffer`对象中要写入的数据的起始位置
+`length`：要写入的`buffer`数据的长度
+`position`：向`fd`文件写入内容的起始位置
+`callback`：回调函数接受3个参数`err`,`len`,`newBf`分别是，写入数据的错误信息 写入数据的长度，写入数据的`buffer`
 
-6. `fs.write(fd, data[, position[, encoding]], callback)`
-把data写入到文档中通过指定的fd,如果data不是buffer对象的实例则会把值强制转化成一个字符串。
+6. `fs.write(fd, data, position, encoding, callback)`
+把`data`写入到文档中通过指定的`fd`,如果`data`不是`buffer`对象的实例则会把值强制转化成一个字符串。
+`fd`：通过`open`方法成功打开一个文件返回的一个数字编号
+`data`：字符串，向`fd`文件写入的内容
+`position`：向`fd`文件写入内容的起始位置
+`encoding`：编码格式`utf-8`等
+`callback`：回调函数接受3个参数`err`,`len`,`newBf`分别是，写入数据的错误信息 写入数据的长度，写入数据的`buffer`
 
 7. `fs.writeSync(fd, buffer, offset, length[, position])`
-fs.write()的同步版本
+`fs.write()`的同步版本
 
-8. `fs.writeSync(fd, data[, position[, encoding]])`
-fs.write()的同步版
+8. `fs.writeSync(fd, data, position, encoding)`
+`fs.write()`的同步版
 
 9. `fs.close(fd, callback)`
 关闭一个打开的文件
 
 10. `fs.closeSync(fd)`
-fs.close() 的同步版本
+`fs.close()`的同步版本
 
 11. `fs.writeFlie(filename, data, [options], callback)`
-异步的将数据写入一个文件,如果文件不存在则新建, 如果文件原先存在，会被替换。 data 可以是一个string，也可以是一个原生buffer
+异步的将数据写入一个文件,如果文件不存在则新建, 如果文件存在则新的内容会覆盖原有文件的的内容。 `data` 可以是一个`string`，也可以是一个原生`buffer`
+
 
 12. `fs.writeFileSync(filename, data, [options])`
 fs.writeFile的同步版本。注意：没有callback，也不需要
