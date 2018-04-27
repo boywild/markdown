@@ -196,69 +196,144 @@ fs.open() 的同步版
 10. `fs.closeSync(fd)`
 `fs.close()`的同步版本
 
-11. `fs.writeFlie(filename, data, [options], callback)`
+11. `fs.writeFlie(filename, data, options, callback)`
 异步的将数据写入一个文件,如果文件不存在则新建, 如果文件存在则新的内容会覆盖原有文件的的内容。 `data` 可以是一个`string`，也可以是一个原生`buffer`
-
+`filename`：需要写入或者新建的文件名
+`data`：需要写入的数据
+`options`：设置编码格式等配置项
+`callback`：回掉函数接受一个参数`err`，为`true`表示读取文件或者创建文件失败
 
 12. `fs.writeFileSync(filename, data, [options])`
 fs.writeFile的同步版本。注意：没有callback，也不需要
 
-13. `fs.appendFile(filename, data, [options], callback)`
-异步的将数据添加到一个文件的尾部，如果文件不存在，会创建一个新的文件。 data 可以是一个string，也可以是原生buffer
+13. `fs.appendFile(filename, data, options, callback)`
+异步的将数据添加到一个文件的尾部，如果文件不存在，会创建一个新的文件。 `data` 可以是一个`string`，也可以是原生`buffer`
+`filename`：需要写入或者新建的文件名
+`data`：需要添加的数据
+`options`：设置编码格式等配置项
+`callback`：回掉函数接受一个参数`err`，为`true`表示读取文件或者创建文件失败
 
-14. `fs.appendFileSync(filename, data, [options])`
-fs.appendFile的同步版本
+14. `fs.appendFileSync(filename, data, options)`
+`fs.appendFile`的同步版本
 
-15. `fs.readFile(filename, [options], callback)`
+15. `fs.readFile(filename, options, callback)`
 异步读取一个文件的全部内容
+`filename`：要读取的文件名
+`options`：配置项，可选
+`callback`：回掉函数，接受2个参数`(err,data)`，分别表示读取错误，成功读取的数据
 
 16. `fs.readFileSync(filename, [options])`
-fs.readFile的同步版本
+`fs.readFile`的同步版本
 
 17. `fs.exists(path, callback)`
 检查指定路径的文件或者目录是否存在
+`path`：需要检查的文件路径
+`callback`：回掉函数接受一个参数isExists,为true表示文件存在，为false表示文件不存在
 
 18. `fs.existsSync(path)`
-fs.exists的同步版本
+`fs.exists`的同步版本
 
 19. `fs.unlink(path, callback)`
 删除一个文件
+`callback`：回到函数接受一个参数`err`，为`true`表示删除失败
 
 20. `fs.unlinkSync(path)`
 fs.unlink() 的同步版本
 
 21. `fs.rename(oldPath, newPath, callback)`
 重命名
+`oldPath`：需要重命名的文件路径
+`newPath`：将旧文件更名为新文件的路径
+`callback`：更名成功回掉，不接受任何参数
 
 22. `fs.renameSync(oldPath, newPath)`
-fs.rename() 的同步版本
+`fs.rename()`的同步版本
 
 23. `fs.stat(path, callback)`
 读取文件信息
+`path`：需要读取的文件
+`callback`：读取成功回掉，接受2个参数`(err,info)`，分别表示`(错误,读取的信息)`
 
 24. `fs.statSync(path, callback)`
-fs.stat() 的同步版本
+`fs.stat()`的同步版本
 
-25. `fs.watch(filename, [options], [listener])`
-观察指定路径的改变，filename 路径可以是文件或者目录
+25. `fs.watch(filename, options, listener)`
+观察指定路径的改变，`filename`路径可以是文件或者目录
+*注意：*不是完全跨平台，其在某些情况下不可用
+`filename`：要监听的文件
+`options`：设置，可选，如果`option`现象被提供那么它应当是一个只包含成员`persistent`的对象，`persistent`为`boolean`类型。`persistent`制定了进程是否只要文件被见识就继续执行，缺省值为`{persistent:true}`
+`listener`：状态改变回掉函数接受2个参数`(ev,fn)`，分别表示事件`(change/rename)`，文件是否改变
 
-26. `fs.mkdir(path, [mode], callback)`
+26. `fs.mkdir(path, mode, callback)`
 创建文件夹
+`callback`：接受一个参数err 为true创建目录失败
 
-27. `fs.mkdirSync(path, [mode])`
-fs.mkdir的同步版本
+27. `fs.mkdirSync(path,mode)`
+`fs.mkdir`的同步版本
 
 28. `fs.readdir(path, callback)`
 读取文件夹
+`callback`：接受两个参数`(err,fileList)`，分别为`(读取失败,文件夹包含内容list)`
 
 29. `fs.readdirSync(path)`
-fs.readdir同步版本
+`fs.readdir`同步版本
 
 30. `fs.rmdir(path, callback)`
 删除文件夹
+`callback`：接受一个参数err 为true创建目录失败
 
 31. `fs.rmdirSync(path)`
-fs.rmdir的同步版本
+`fs.rmdir`的同步版本
+
+用node进行项目构建
+
+```js
+var projectData={
+    name:'miaov',
+    fileData:[
+        {
+            name:'css',
+            type:'dir'
+        },
+        {
+            name:'image',
+            type:'dir'
+        },
+        {
+            name:'js',
+            type:'dir'
+        },
+        {
+            name:'index.html',
+            type:'file',
+            content:'<!DOCTYPE html>\n<html lang="en">\n <head>\n\t<meta charset="UTF-8">\n\t<title>Document</title>\n</head>\n<body>\n</body>\n</html>'
+        }
+    ]
+};
+var fs=require('fs');
+
+if(projectData.name){
+    fs.mkdirSync(projectData.name);
+    var fileData=projectData.fileData;
+    if(fileData){
+        fileData.forEach(function (f) {
+            f.path=projectData.name+'/'+f.name;
+            f.content=f.content || '';
+            switch (f.type){
+                case 'dir':
+                    fs.mkdirSync(f.path);
+                    break;
+                case 'file':
+                    fs.writeFileSync(f.path,f.content);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+}
+```
 
 
 
