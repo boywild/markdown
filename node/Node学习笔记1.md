@@ -335,7 +335,208 @@ if(projectData.name){
 }
 ```
 
+node实现监听并打包文件
+
+```js
+var fs=require('fs');
+
+var filedir='./miaov/js';
+
+fs.watch(filedir,function (ev,fn) {
+    console.log(ev);
+    fs.readdir(filedir,function (err,dataList) {
+        var content='';
+        dataList.forEach(function (file) {
+            var info=fs.statSync(filedir+'/'+file);
+            switch (info.mode){
+                case 33206:
+                    var con=fs.readFileSync(filedir+'/'+file);
+                    content+=con.toString();
+                    break;
+                case 16822:
+                    break;
+            }
+        });
+
+        fs.writeFileSync('./build.js',content);
+        console.log(content);
+    })
+});
+
+```
 
 
+##http模块
+使用该模块是需要引入var http=require('http')
+
+createServer()
+var server=http.createServer(requestListener)
+- 创建并返回一个HTTP服务器对象
+- requestListener监听到客户端链接的的回掉函数
+
+server.listen(port,hostname,backlog,callback)
+监听客户端连接请求，只有调用listen方法以后，服务器才开始工作
+port：监听的端口
+hostname：主机名(IP/域名)
+backlog：链接等待列队的最大长度
+callback：调用listen方法并成功开启监听以后，会触发一个listening事件，callback将作为该事件的执行函数
+
+listening事件，当server调用listen方法并成功开始监听以后触发的事件
+error事件：当服务器失败的时候触发事件，参数err：具体错误对象
+
+request事件：当有客户端发送请求到该主机和端口的请求的时候触发，该事件的回掉函数接受2个参数：
+参数request：http.IncomingMessage的一个实例，通过它我们可以获取到这次请求的一些信息，部分常用参数
+httpVersion：使用的http协议的版本
+headers：请求头信息中的数据
+url：请求的地址
+method：请求方式
+
+参数response：http.ServerResponse的是一个实例，通过它我们可以向该次请求的客户端输出返回响应
+write(chunk,encoding)：发送一个数据块到响应正文中。chunk为需要发送到客户端的内容
+end(chunk,encoding)：当所有的正文和头信息发送完成以后调用该方法告诉服务器数据以及全部发送完成了，这个方法在每次完成信息发送以后必须调用，并且是最后调用
+statusCode：该属性用来设置返回的状态码
+setHeader(name,value)：设置返回头信息
+writeHead(statusCode,reasonPhrase,headers)：这个方法只能在当前请求中使用一次，并且必须要在response.end()之前调用
+statusCode：状态码，用来标识服务器处理后的状态 404 403 之类
+reasonPhrase：和状态码对应的文字描述，可选，如果不填，自动查找和状态码匹配的文字，一般情况不对该字段进行更改
+headers：需要设置的头信息，是一个对象
+
+```js
+var http=require('http');
+var server=http.createServer();
+server.on('listening',function () {
+    console.log('监听中');
+});
+server.on('request',function (req,res) {
+    console.log('客户端有请求了');
+    console.log(req);
+    res.setHeader('name','chentian');
+    res.writeHead('200','asdfasdfasd',{
+        'content-type':'text/html;charset=utf-8'
+    });
+    res.write('<h2>hello word</h2>')
+    res.end();
+});
+server.listen('3000','localhost');
+```
+
+##url
+require('url')
+```js
+var urlStr=url.parse('https://www.baidu.com:8088/a/index.html?name=chentian&&age=28#p=2');
+console.log(urlStr);
+
+{
+  protocol: 'https:',
+  slashes: true,
+  auth: null,
+  host: 'www.baidu.com:8088',
+  port: '8088',
+  hostname: 'www.baidu.com',
+  hash: '#p=2',
+  search: '?name=chentian&&age=28',
+  query: 'name=chentian&&age=28',
+  pathname: '/a/index.html',
+  path: '/a/index.html?name=chentian&&age=28',
+  href: 'https://www.baidu.com:8088/a/index.html?name=chentian&&age=28#p=2' 
+}
+```
+
+```js
+var http=require('http');
+var url=require('url');
+var server=http.createServer();
+server.on('listening',function () {
+    console.log('监听中');
+});
+server.on('request',function (req,res) {
+    console.log('客户端有请求了');
+    console.log(req)
+    var urlStr=url.parse(req.url);
+    console.log(urlStr);
+    switch (urlStr.pathname){
+        case '/':
+            res.writeHead('200',{
+                'content-type':'text/html;charset=utf-8'
+            });
+            res.write('<h2>这里是首页</h2>');
+            break;
+        case '/user':
+            res.writeHead('200',{
+                'content-type':'text/html;charset=utf-8'
+            });
+            res.write('<h2>这里是用户页</h2>');
+            break;
+        default:
+            res.writeHead('404',{
+                'content-type':'text/html;charset=utf-8'
+            });
+            res.write('<h2>对不起，你访问的页面不存在</h2>');
+            break;
+    }
+
+    res.end();
+});
+server.listen('3000','localhost');
+```
+
+##querystring
+get
+post请求的数据处理
+post发送的数据会被写入缓冲区中，需要通过request的data事件和end事件来进行数据拼接处理
+querystring模块
+parse() 将一个query string反序列化为一个对象
+
+
+```js
+server.on('request',function (req,res) {
+    var urlStr=url.parse(req.url);
+    switch (urlStr.pathname){
+        case '/':
+            senData('/index.html',req,res);
+            break;
+        case '/user':
+            senData('/user.html',req,res);
+            break;
+        case '/login':
+            senData('/login.html',req,res);
+            break;
+        case '/login/check':
+            var content='',param='';
+            if(req.method.toUpperCase()==='POST'){
+                req.on('data',function (chunk) {
+                    content+=chunk;
+                });
+                req.on('end',function () {
+                    param=querystring.parse(content);
+                });
+            }else{
+                param=querystring.parse(urlStr.query);
+            }
+            console.log(param);
+            senData('/check.html',req,res);
+            break;
+        default:
+            senData('error.html',req,res);
+            break;
+    }
+});
+function sendData(path,req,res){
+    var file=__dirname+'/html';
+    fs.readFile(file+path,function(err,data){
+        if(err){
+            res.writeHead('404',{
+                'content-type':'text/html;charset=utf-8'
+            })
+            res.end('<h1>抱歉，你访问的页面不存在</h1>')
+        }else{
+            res.writeHead('200',{
+                'content-type':'text/html;charset=utf-8'
+            });
+            res.end(data);
+        }
+    });
+}
+```
 
 
