@@ -1,5 +1,6 @@
 ##一、webpack3.x.x基本介绍
-* **1-1**webpack基本介绍
+
+* **1-1** webpack基本介绍
 webpack的概念和作用
 模块打包器
 代码分割 
@@ -9,7 +10,7 @@ commonjs规范
 模块热更新
 适用于大型项目
 
-* **1-2**webpack安装和命令
+* **1-2** webpack安装和命令
 安装
 `npm install webpack --save-dev`
 
@@ -34,7 +35,7 @@ commonjs规范
 * **2-1**建立项目的webpack配置
 
 例子：
-在webpack-demo目录下新建以下文件
+在`webpack-demo`目录下新建以下文件
 
 	webpack-demo
 	-dist
@@ -57,9 +58,9 @@ module.exports = {
     }
 }
 ```
-运行 webpack 会在dist下的js目录下生成bundle.js
+运行 `webpack` 会在`dist`下的js目录下生成`bundle.js`
 
-可在pack.json的script字段中添加配置webpack
+可在`package.json`的`script`字段中添加配置`webpack`
 
 	"scripts": {
 		"webpack":"webpack --config webpack.config.js --progress --display-modules --colors --display-reasons"
@@ -147,10 +148,10 @@ function url(url) {
 * **3-1**自动化生成项目中的html文件(上)
 
 安装
-html-webpack-plugin(这里有个坑就是，如果在全局安装webpack，在运行npm run webpack之前需要运行 npm link webpack)
-自动生成html的意义在于，html中引用的js文件好多都是webpack打包之后生成的，生成的文件名和目录都有可能改变，这个时候不能手动来修改每一个变动的路径，太耗时，这个时候就要通过html-webpack-plugins这个插件来自动在html中生成对js的引用
+`html-webpack-plugin`(这里有个坑就是，如果在全局安装webpack，在运行npm run webpack之前需要运行 `npm link webpack`)
+自动生成html的意义在于，`html`中引用的`js`文件好多都是`webpack`打包之后生成的，生成的文件名和目录都有可能改变，这个时候不能手动来修改每一个变动的路径，太耗时，这个时候就要通过`html-webpack-plugins`这个插件来自动在html中生成对js的引用
 
-在webpack.config.js中加入plugins配置项
+在`webpack.config.js`中加入`plugins`配置项
 
 ```js
 var htmlWebpackPlugin = require('html-webpack-plugin');
@@ -171,11 +172,11 @@ module.exports = {
     ]
 }
 ```
-在htmlWebpackPlugin插件中配置项template用来定义引用的模板文件,inject用来指定脚本在dom文档中的插入位置
+在`htmlWebpackPlugin`插件中配置项`template`用来定义引用的模板文件,`inject`用来指定脚本在`dom`文档中的插入位置
 
 * **3-2**自动化生成项目中的html文件(中)
 
-template应用场景
+`template`应用场景
 在参数中传参，在模板中引用
 
 ```js
@@ -360,6 +361,7 @@ module.exports = {
     ]
 }
 ```
+
 `main.html`中会生成 `a.js b.js c.js`
 `a.html`中会生成`b.js c.js`
 `b.html`中会生成`a.js c.js`
@@ -375,6 +377,7 @@ compilation.assets[htmlWebpackPlugin.files.chunks.main.entry].source()
 ```js
 compilation.assets[htmlWebpackPlugin.files.chunks.main.entry.substr(htmlWebpackPlugin.files.publicPath.length)].source()
 ```
+
 `htmlWebpackPlugin.files.publicPath.length` 得到`publicPath`的长度例如 `https://www.baidu.com`
 `htmlWebpackPlugin.files.chunks.main.entry.substr()`得到文件真实路径
 最后用`compilation.assets[].source()`得到内容
@@ -384,7 +387,7 @@ compilation.assets[htmlWebpackPlugin.files.chunks.main.entry.substr(htmlWebpackP
 
 
 ##四、处理项目中的资源文件
-* **4-1**什么是loader以及loader的特性
+* **4-1**什么是`loader`以及`loader`的特性
 
 加载器是应用于模块源代码的转换。它们允许您在导入或“加载”它们时预处理文件。因此，加载器就像是其他构建工具中的“任务”，并提供了一种强大的方法来处理前端构建步骤。加载器可以将文件从不同的语言(如打字稿)转换为JavaScript，或者将内联图像转换为数据url。加载器甚至允许您直接从JavaScript模块导入CSS文件
 
@@ -522,17 +525,17 @@ module.exports={
 }
 ```
 
-注意，webpack目前只在您的node_modules文件夹中搜索加载器。如果这些加载器是在您的node_modules文件夹之外定义的，那么您需要使用resolveLoader属性来获得webpack来包含您的loader。例如，假设您的自定义加载器包含在一个名为loaders的文件夹中。您需要在配置文件中添加以下内容:
+注意，`webpack`目前只在您的`node_modules`文件夹中搜索加载器。如果这些加载器是在您的`node_modules`文件夹之外定义的，那么您需要使用`resolveLoader`属性来获得`webpack`来包含您的`loader`。例如，假设您的自定义加载器包含在一个名为`loaders`的文件夹中。您需要在配置文件中添加以下内容:
 
     resolveLoader: {
         modules: ['node_modules', path.resolve(__dirname, 'loaders')]
     }
 
-path.resolve(__dirname+'')，用来将相对路径改为绝对路径
-cnpm install --save-dev babel-preset-latest
-cnpm install --save-dev babel
+`path.resolve(__dirname+'')`，用来将相对路径改为绝对路径
+`cnpm install --save-dev babel-preset-latest`
+`cnpm install --save-dev babel`
 
-注意：在webpack2.0中 有些不一样
+注意：在`webpack2.0`中 有些不一样
 
 ```js
 module: {
@@ -549,7 +552,7 @@ module: {
     ]
 }
 ```
-**注意：**加入include配置项会导致babel不处理es6语法，原因暂不明
+**注意：**加入`include`配置项会导致`babel`不处理`es6`语法，原因暂不明
 
 
 * **4-3**处理项目中的css
@@ -600,10 +603,10 @@ module: {
 
 * **4-4**使用less和sass
 
-sass-loader less-loader
+`sass-loader less-loader`
 
     npm install sass-loader node-sass webpack --save-dev
-sass-loader依赖node-sass和webpack
+`sass-loader`依赖`node-sass`和`webpack`
 
 ```js
 {
@@ -648,8 +651,8 @@ sass-loader依赖node-sass和webpack
 
 
 * **4-6**处理图片及其他文件
-file-loader url-loader用来处理图片
-url-loader和fileloader差不多，但是可以指定limit参数，当图片大小，小雨limit时由url-loader处理成base64，当图片大小大于imit时就由file-loader处理成路径
+`file-loader url-loader`用来处理图片
+`url-loader`和`fileloader`差不多，但是可以指定`limit`参数，当图片大小，小于`limit`时由`url-loader`处理成`base64`，当图片大小大于imit时就由`file-loader`处理成路径
 
 image-webpack-loader用来压缩图片
 
@@ -829,6 +832,7 @@ module.exports={
 }
 ```
 
-https://github.com/boywild/webpack3.x.x-demo
+[webpack3.x.x-demo](https://github.com/boywild/webpack3.x.x-demo)
 
 
+	
