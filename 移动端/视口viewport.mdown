@@ -1,41 +1,52 @@
-#visual viewport
+
+# 手机设备上的一些名词及概念
+
+# 屏幕尺寸
+我们通常所说的iPhone5屏幕尺寸为4英寸、iPhone6屏幕尺寸为4.7英寸，指的是显示屏对角线的长度
+
+# 虚拟试图(visual viewport)
 可以认为是设备自己的宽度，也叫视口尺寸指的是浏览器可视区域的宽度。
 
-#layout viewport
+# 布局试图(layout viewport)
 可以认为是虚拟的窗口，也可以片面的理解为苹果或者安卓手机屏幕的分辨率(注：是分辨率而非手机屏幕大小)
 
-#ideal viewport
+# 实际试图(ideal viewport)
 移动设备的理想viewport
 
 当你打开一个`960px`设计的网页时，手机会根据css中的百分比进行缩放。比如总长`960`的页面，导航条是`20%`。（实际解析出来就是`192px`）但是你不可能每个属性都是百分比吧，比如文字大小。那么我用`320px`屏幕打开，导航条就成了`64px`了，但是我的字体大小是`12px`啊，完了，本来能显示很多汉字的`（192/12）`现在只能显示`64/12`个汉字了。
 
-Apple找到了一个办法：在移动版(iOS)的Safari中定义了viewport meta标签
+`Apple`找到了一个办法：在移动版`(iOS)`的`Safari`中定义了`viewport meta`标签
 
-①它的作用就是创建一个虚拟的窗口(`viewport`)，而且这个虚拟窗口的分辨率接近于桌面显示器，Apple将其定位为`980px`
-②一代iphone下的Safari来说就是：在iphone的`320px`物理屏幕上——视觉窗口(visual viewport)，创建出了一个980px的虚拟窗口——布局窗口(layout viewport)，在视觉窗口(visual viewport)中我们可以拖动横向竖向滑动条或者放大缩小网页来达到最佳的浏览效果(类似桌面浏览器)；而布局窗口(layout viewport)用来配合CSS渲染布局
+①它的作用就是创建一个虚拟的窗口(`viewport`)，而且这个虚拟窗口的分辨率接近于桌面显示器，`Apple`将其定位为`980px`
+②一代`iphone`下的`Safari`来说就是：在`iphone`的`320px`物理屏幕上——视觉窗口(`visual viewport`)，创建出了一个`980px`的虚拟窗口——布局窗口(`layout viewport`)，在视觉窗口(`visual viewport`)中我们可以拖动横向竖向滑动条或者放大缩小网页来达到最佳的浏览效果(类似桌面浏览器)；而布局窗口(`layout viewport`)用来配合CSS渲染布局
 
-#物理像素(physical pixel)
+# 物理像素(physical pixel)
 一个物理像素是显示器(手机屏幕)上最小的物理显示单元，在操作系统的调度下，每一个设备像素都有自己的颜色值和亮度值。
+用通俗的方式来理解就是，用手机截屏，放在`pc`显示器上浏览，在`pc`上查看属性，显示该截图是多少`px`那么该手机的物理像素就是多少`px`
 
-#设备独立像素(density-independent pixel)
+# 设备独立像素DIP(density independent pixel/device independent pixels)
 设备独立像素(也叫密度无关像素)，可以认为是计算机坐标系统中得一个点，这个点代表一个可以由程序使用的虚拟像素(比如: css像素)，然后由相关系统转换为物理像素。
+用通俗的方式理解就是，把当前手机设备，放在`pc`显示器上做比较，该手机占`pc`显示器多少`px`，那么此设备的独立像素就是多少`px`
 
-#设备像素比(device pixel ratio )
+# 像素密度PPI(pixel per inch)
+表示沿着对角线，每英寸所拥有的像素（Pixel）数目。PPI数值越高，代表显示屏能够以越高的密度显示图像，即通常所说的分辨率越高、颗粒感越弱
+所以ppi能够通过公式计算出来，列如：iPhone 4s,屏幕尺寸3.5-inch，物理像素640x960
+
+
+# DPI(dot per inch)
+
+# 设备像素比(device pixel ratio )
 设备像素比(简称dpr)定义了物理像素和设备独立像素的对应关系，它的值可以按如下的公式的得到：
 
 ```
-设备像素比 = 物理像素 / 设备独立像素 // 在某一方向上，x方向或者y方向
+设备像素比 = 物理像素 / 设备独立像素
 ```
 
-在javascript中，可以通过window.devicePixelRatio获取到当前设备的dpr。
-在css中，可以通过`-webkit-device-pixel-ratio`，`-webkit-min-device-pixel-ratio`和 `-webkit-max-device-pixel-ratio`进行媒体查询，对不同dpr的设备，做一些样式适配(这里只针对`webkit`内核的浏览器和`webview`)
-
-#高像素密度屏幕（高 ppi）
-`window.devicePixelRatio`(`device pixel ratio`/`dip`或`dpI`或`dpr`)是设备上物理像素和设备独立像素(`device-independent pixels` (dips))的比例
-公式表示就是：
+在`javascript`中，可以通过`window.devicePixelRatio`获取到当前设备的`dpr`。
+在`css`中，可以通过`-webkit-device-pixel-ratio`，`-webkit-min-device-pixel-ratio`和 `-webkit-max-device-pixel-ratio`进行媒体查询，对不同`dpr`的设备，做一些样式适配(这里只针对`webkit`内核的浏览器和`webview`)
 
 ```
-window.devicePixelRatio = 物理像素 / dips
+window.devicePixelRatio = 物理像素 / DIP
 ```
 
 `dip`或`dpI`(指每英寸点的个数),（`device independent pixels`，设备独立像素）与屏幕密度有关。`dip`可以用来辅助区分视网膜设备还是非视网膜设备
@@ -43,12 +54,12 @@ window.devicePixelRatio = 物理像素 / dips
 设备独立像素也就是设备屏幕实物的尺寸
 
 ```
-本文的DIPs切勿和DPI搞混了！DPI指每英寸点的个数，本文的DIPs指设备独立像素。
+本文的DIPs切勿和DPI搞混了！DPI指每英寸点的个数，本文的DIP指设备独立像素。
 ```
 
 #概念理解
 
-移动设备上的浏览器认为自己必须能让所有的网站都正常显示，即使是那些不是为移动设备设计的网站。但如果以浏览器的可视区域作为`viewport`的话，因为移动设备的屏幕都不是很宽，所以那些为桌面浏览器设计的网站放到移动设备上显示时，必然会因为移动设备的`viewport`太窄，而挤作一团，甚至布局什么的都会乱掉。也许有人会问，现在不是有很多手机分辨率都非常大吗，比如`768x1024`，或者`1080x1920`这样，那这样的手机用来显示为桌面浏览器设计的网站是没问题的吧？前面我们已经说了，css中的1px并不是代表屏幕上的`1px`，你分辨率越大，`css`中`1px`代表的物理像素就会越多，`devicePixelRatio`的值也越大，这很好理解，因为你分辨率增大了，但屏幕尺寸并没有变大多少，必须让css中的1px代表更多的物理像素，才能让1px的东西在屏幕上的大小与那些低分辨率的设备差不多，不然就会因为太小而看不清。所以在`1080x1920`这样的设备上，在默认情况下，也许你只要把一个div的宽度设为`300`多px（视`devicePixelRatio`的值而定），就是满屏的宽度了。回到正题上来，如果把移动设备上浏览器的可视区域设为viewport的话，某些网站就会因为`viewport`太窄而显示错乱，所以这些浏览器就决定默认情况下把`viewport`设为一个较宽的值，比如`980px`，这样的话即使是那些为桌面设计的网站也能在移动浏览器上正常显示了。
+移动设备上的浏览器认为自己必须能让所有的网站都正常显示，即使是那些不是为移动设备设计的网站。但如果以浏览器的可视区域作为`viewport`的话，因为移动设备的屏幕都不是很宽，所以那些为桌面浏览器设计的网站放到移动设备上显示时，必然会因为移动设备的`viewport`太窄，而挤作一团，甚至布局什么的都会乱掉。也许有人会问，现在不是有很多手机分辨率都非常大吗，比如`768x1024`，或者`1080x1920`这样，那这样的手机用来显示为桌面浏览器设计的网站是没问题的吧？前面我们已经说了，css中的1px并不是代表屏幕上的`1px`，分辨率越大，`css`中`1px`代表的物理像素就会越多，`devicePixelRatio`的值也越大，这很好理解，因为你分辨率增大了，但屏幕尺寸并没有变大多少，必须让`css`中的`1px`代表更多的物理像素，才能让1px的东西在屏幕上的大小与那些低分辨率的设备差不多，不然就会因为太小而看不清。所以在`1080x1920`这样的设备上，在默认情况下，也许你只要把一个div的宽度设为`300`多px（视`devicePixelRatio`的值而定），就是满屏的宽度了。回到正题上来，如果把移动设备上浏览器的可视区域设为`viewport`的话，某些网站就会因为`viewport`太窄而显示错乱，所以这些浏览器就决定默认情况下把`viewport`设为一个较宽的值，比如`980px`，这样的话即使是那些为桌面设计的网站也能在移动浏览器上正常显示了。
 
 `ppk`把这个浏览器默认的`viewport`叫做 **layout viewport**。这个`layout viewport`的宽度可以通过`document.documentElement.clientWidth`来获取。
 
